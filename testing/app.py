@@ -42,6 +42,23 @@ def get_aadi():
 
     return jsonify(InfoDb)
 
+@app.route('/api/aaditya')
+def get_aaditya():
+    # start a list, to be used like a information database
+    InfoDb = []
+
+    # add a row to list, an Info record
+    InfoDb.append({
+        "FirstName": "Aaditya",
+        "LastName": "Taleppady",
+        "DOB": "May 4",
+        "Residence": "San Diego",
+        "Email": "aadityar.taleppady@gmail.com",
+        "Owns_Cars": ["Lamborghini, Tesla, Mercedes"]
+    })
+
+    return jsonify(InfoDb)
+
 # add an HTML endpoint to flask app
 @app.route('/')
 def say_hello():
