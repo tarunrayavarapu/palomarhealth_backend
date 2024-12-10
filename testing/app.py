@@ -25,6 +25,23 @@ def get_kiruthic():
 
     return jsonify(InfoDb)
 
+@app.route('/api/aadi')
+def get_aadi():
+    # start a list, to be used like a information database
+    InfoDb = []
+
+    # add a row to list, an Info record
+    InfoDb.append({
+        "FirstName": "Aadi",
+        "LastName": "Bhat",
+        "DOB": "July 8",
+        "Residence": "San Diego",
+        "Email": "aadibhat09@gmail.com",
+        "Owns_Cars": ["Lexus", "Tesla", "Honda"]
+    })
+
+    return jsonify(InfoDb)
+
 # add an HTML endpoint to flask app
 @app.route('/')
 def say_hello():
