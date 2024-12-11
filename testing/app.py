@@ -94,6 +94,40 @@ def get_arhaan():
 
     return jsonify(InfoDb)
 
+@app.route('/api/tarun')
+def get_tarun():
+    # start a list, to be used like a information database
+    InfoDb = []
+
+    # add a row to list, an Info record
+    InfoDb.append({
+        "FirstName": "Tarun",
+        "LastName": "Rayavarapu",
+        "DOB": "March 11",
+        "Residence": "San Diego",
+        "Email": "tarunsrayavarapu@gmail.com",
+        "Owns_Cars": ["Honda, Tesla, Ferrari"]
+    })
+
+    return jsonify(InfoDb)
+
+@app.route('/api/rohan')
+def get_rohan():
+    # start a list, to be used like a information database
+    InfoDb = []
+
+    # add a row to list, an Info record
+    InfoDb.append({
+        "FirstName": "Rohan",
+        "LastName": "Bojja",
+        "DOB": "April 23",
+        "Residence": "San Diego",
+        "Email": "rbojja23@gmail.com",
+        "Owns_Cars": ["Audi, Tesla"]
+    })
+
+    return jsonify(InfoDb)
+
 # add an HTML endpoint to flask app
 @app.route('/')
 def say_hello():
