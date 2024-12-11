@@ -1,6 +1,6 @@
 # README
 
-> This is a project to support AP Computer Science Principles (CSP) as well as a UC articulated Data Structures course. It was crafted iteratively starting in 2020 to the present time.  The primary purposes are ...
+> This is a project to support AP Computer Science Principles (CSP) as well as a UC articulated Data Structures course. It was crafted iteratively starting in 2020 to the present time.  The primary purposes...
 
 - Used as starter code for student projects for `AP CSP 1 and 2` and `Data Structures 1` curriculum.
 - Used to teach key principles in learning the Python Flask programming environment.
