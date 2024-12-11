@@ -28,6 +28,10 @@ from api.carphoto import car_api
 from api.carChat import car_chat_api
 
 from api.vote import vote_api
+
+from api.travel import *
+
+
 # database Initialization functions
 from model.carChat import CarChat
 from model.user import User, initUsers
