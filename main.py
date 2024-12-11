@@ -41,6 +41,14 @@ from model.channel import Channel, initChannels
 from model.post import Post, initPosts
 from model.nestPost import NestPost, initNestPosts # Justin added this, custom format for his website
 from model.vote import Vote, initVotes
+
+from api.travel.kiruthic import *
+from api.travel.aadi import *
+from api.travel.derek import *
+from api.travel.aaditya import *
+from api.travel.arhaan import *
+from api.travel.tarun import *
+from api.travel.rohan import *
 # server only Views
 
 # register URIs for api endpoints
@@ -57,6 +65,15 @@ app.register_blueprint(nestPost_api)
 app.register_blueprint(nestImg_api)
 app.register_blueprint(vote_api)
 app.register_blueprint(car_api)
+
+app.register_blueprint(kiruthic_api)
+app.register_blueprint(aadi_api)
+app.register_blueprint(derek_api)
+app.register_blueprint(aaditya_api)
+app.register_blueprint(arhaan_api)
+app.register_blueprint(tarun_api)
+app.register_blueprint(rohan_api)
+
 
 # Tell Flask-Login the view function name of your login route
 login_manager.login_view = "login"

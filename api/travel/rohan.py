@@ -13,36 +13,18 @@ class StudentAPI:
    @staticmethod
    def get_student(name):
        students = {
-           "John": {
-               "name": "John",
-               "age": 21,
-               "major": "Computer Science",
-               "university": "XYZ University"
-           },
-           "Jeff": {
-               "name": "Jeff",
-               "age": 22,
-               "major": "Mechanical Engineering",
-               "university": "ABC University"
+           "Rohan": {
+               "name": "Rohan",
+               "age": 15,
+               "major": "CS",
+               "university": "Del Norte High School"
            }
        }
        return students.get(name)
 
 
-   class _John(Resource):
+   class _Rohan(Resource):
        def get(self):
            # Use the helper method to get John's details
-           john_details = StudentAPI.get_student("John")
-           return jsonify(john_details)
-
-
-   class _Jeff(Resource):
-       def get(self):
-           # Use the helper method to get Jeff's details
-           jeff_details = StudentAPI.get_student("Jeff")
-           return jsonify(jeff_details)
-
-
-   class _Bulk(Resource):
-       def get(self):
-           # Use the helper method to get both John's and Jeff's details
+           rohan_details = StudentAPI.get_student("Rohan")
+           return jsonify(rohan_details)
