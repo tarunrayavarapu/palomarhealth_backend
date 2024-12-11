@@ -2,11 +2,11 @@ from flask import Blueprint, jsonify
 from flask_restful import Api, Resource
 
 
-student_api = Blueprint('student_api', __name__, url_prefix='/api')
+rohan_api = Blueprint('student_api', __name__, url_prefix='/api')
 
 
 # API docs https://flask-restful.readthedocs.io/en/latest/api.html
-api = Api(student_api)
+api = Api(rohan_api)
 
 
 class StudentAPI:
@@ -16,8 +16,8 @@ class StudentAPI:
            "Rohan": {
                "name": "Rohan",
                "age": 15,
-               "major": "CS",
-               "university": "Del Norte High School"
+               "favorite_food": "Rice",
+               "school": "Del Norte High School"
            }
        }
        return students.get(name)
