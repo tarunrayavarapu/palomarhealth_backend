@@ -1,27 +1,20 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, request, jsonify, g
 from flask_restful import Api, Resource
 
-tarun_api = Blueprint('tarun_api', __name__, url_prefix='/api')
-
+tarun_api = Blueprint('_api', __name__, url_prefix='/api')
 api = Api(tarun_api)
 
 class TarunAPI:
-    @staticmethod
-    def get_student():
-        return {
-            "name": "Tarun",
-            "age": 24,
-            "favorite_sport": "Basketball/Soccer",
-            "origin": "India",
-            "classes": "AP Chem, AP CSP, AP Calc AB, World History, English",
-            "favorite food": "Pizza, Pasta, Curry"
-            }
-
-    class _Tarun(Resource):
+    class _A_Person(Resource):
         def get(self):
-            tarun_details = TarunAPI.get_student()
-            return jsonify(tarun_details)
+            return jsonify({
+                "name": "Tarun Rayavarapu",
+                "age": 16,
+                "classes": ["AP CSP", "AP Chemistry", "World History", "AP Calculus AB", "English"],
+                "favorite": "Pizza, Pasta, Curry",
+                "sports": "Soccer, Basketball",
+                "Origin": "India"
+            })
+    
 
-    api.add_resource(_Tarun, '/student/tarun')
-
-tarun_api_instance = TarunAPI()
+api.add_resource(KiruthicAPI._A_Person, "/kiruthic")
