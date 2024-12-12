@@ -5,7 +5,7 @@ arhaan_api = Blueprint('arhaan_api', __name__, url_prefix='/api')
 api = Api(arhaan_api)
 
 class ArhaanAPI:
-    class _A_Person(Resource):
+    class _Arhaan_Person(Resource):
         def get(self):
             return jsonify({
                 "name": "Arhaan Memon",
@@ -16,4 +16,4 @@ class ArhaanAPI:
             })
     
 
-api.add_resource(ArhaanAPI._A_Person, "/arhaan")
+api.add_resource(ArhaanAPI._Arhaan_Person, "/arhaan")
