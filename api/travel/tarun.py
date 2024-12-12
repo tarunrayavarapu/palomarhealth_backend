@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, g
 from flask_restful import Api, Resource
 
-tarun_api = Blueprint('_api', __name__, url_prefix='/api')
+tarun_api = Blueprint('tarun_api', __name__, url_prefix='/api')
 api = Api(tarun_api)
 
 class TarunAPI:
