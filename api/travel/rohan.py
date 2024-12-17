@@ -10,7 +10,11 @@ class RohanAPI:
             return jsonify({
                 "name": "Rohan Bojja",
                 "age": 15,
-                "sports": ["Basketball", "Badminton", "Taekwondo"]
+                "classes": ["AP CSP", "AP Chemistry", "AP World History", "AP Calculus AB", "AP Seminar"],
+                "favorite": {
+                    "color": "Burgundy",
+                    "food": "Chicken Tikka Masala"
+                }
             })
     
 

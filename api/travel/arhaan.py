@@ -11,8 +11,10 @@ class ArhaanAPI:
                 "name": "Arhaan Memon",
                 "age": 15,
                 "classes": ["AP CSP", "AP Seminar", "AP BIO", "History", "Math 3b"],
-                "Favorite Sport": ["Basketball", "Football"],
-                "Favorite Countries": ["India", "France", "Switcherland"]
+                "favorite": {
+                    "color": "Pink",
+                    "food": "Butter Chicken"
+                }
             })
     
 

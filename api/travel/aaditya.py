@@ -10,8 +10,11 @@ class AadityaAPI:
             return jsonify({
                 "name": "Aaditya Taleppady",
                 "age": 15,
-                "favorite_vacations": ["India", "Colorado", "Mammoth", "Hawaii"],
-                "favorite_sports_teams": ["49ers", "Warriors", "Padres"]
+                "classes": ["AP CSP", "AP Chemistry", "World History 1", "AP Calculus AB", "Offroll P5"],
+                "favorite": {
+                    "color": "Blue",
+                    "food": "Pasta"
+                }
             })
     
 

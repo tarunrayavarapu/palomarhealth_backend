@@ -8,9 +8,9 @@ class DerekAPI:
     class Student(Resource):
         def get(self):
             return jsonify({
-                "name": "Derek",
+                "name": "Derek Kang",
                 "age": 15,
-                "school": "Del Norte High School",
+                "classes": ["AP CSP", "AP Physics Mechanics", "Ap Seminar", "AP Calculus AB", "AP World History"],
                 "favorite": {
                     "color": "Blue",
                     "food": "Pasta"

@@ -11,9 +11,10 @@ class TarunAPI:
                 "name": "Tarun Rayavarapu",
                 "age": 16,
                 "classes": ["AP CSP", "AP Chemistry", "World History", "AP Calculus AB", "English"],
-                "favorite": "Pizza, Pasta, Curry",
-                "sports": "Soccer, Basketball",
-                "Origin": "India"
+                "favorite": {
+                    "color": "Black",
+                    "food": "Pizza, Pasta, Curry"
+                }
             })
     
 

@@ -10,8 +10,11 @@ class AadiAPI:
             return jsonify({
                 "name": "Aadi Bhat",
                 "age": 15,
-                "hobbies": ["Lego", "Mario", "Computer stuff"],
-                "favorite_foods": ["Maggi", "Naan", "Pizza"]
+                "classes": ["AP CSP", "AP Chemistry", "AP Seminar", "AP Calculus AB", "World History", "Honors PoE"],
+                "favorite": {
+                    "color": "Red",
+                    "food": "Noodles"
+                }
             })
     
 
