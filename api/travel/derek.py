@@ -18,4 +18,4 @@ class DerekAPI:
             })
     
 
-api.add_resource(DerekAPI.Student, "/derek")
+api.add_resource(DerekAPI.Student, "/people/derek")

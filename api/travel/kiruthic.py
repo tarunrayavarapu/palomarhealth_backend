@@ -18,5 +18,5 @@ class KiruthicAPI:
             })
     
 
-api.add_resource(KiruthicAPI._A_Person, "/kiruthic")
+api.add_resource(KiruthicAPI._A_Person, "/people/kiruthic")
 

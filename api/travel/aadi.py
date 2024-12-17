@@ -15,4 +15,4 @@ class AadiAPI:
             })
     
 
-api.add_resource(AadiAPI._A_Person, "/aadi")
+api.add_resource(AadiAPI._A_Person, "/people/aadi")

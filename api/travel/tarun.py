@@ -17,4 +17,4 @@ class TarunAPI:
             })
     
 
-api.add_resource(TarunAPI._A_Person, "/tarun")
+api.add_resource(TarunAPI._A_Person, "/people/tarun")

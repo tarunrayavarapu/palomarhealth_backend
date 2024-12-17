@@ -14,4 +14,4 @@ class RohanAPI:
             })
     
 
-api.add_resource(RohanAPI._BojjaAPI, "/rohan")
+api.add_resource(RohanAPI._BojjaAPI, "/people/rohan")

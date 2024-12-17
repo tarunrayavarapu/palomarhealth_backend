@@ -16,4 +16,4 @@ class ArhaanAPI:
             })
     
 
-api.add_resource(ArhaanAPI._Arhaan_Person, "/arhaan")
+api.add_resource(ArhaanAPI._Arhaan_Person, "/people/arhaan")

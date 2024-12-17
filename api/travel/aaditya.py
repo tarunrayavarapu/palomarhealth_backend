@@ -15,4 +15,4 @@ class AadityaAPI:
             })
     
 
-api.add_resource(AadityaAPI._A_Person, "/aaditya")
+api.add_resource(AadityaAPI._A_Person, "/people/aaditya")
