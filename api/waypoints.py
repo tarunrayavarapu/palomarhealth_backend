@@ -1,8 +1,13 @@
-from flask import Flask, request, jsonify
+from flask import Blueprint, request, jsonify
 from flask_restful import Api, Resource
+from flask import Flask
+import json
+import requests
 
-app = Flask(__name__)
-api = Api(app)
+waypoints_api = Blueprint('waypoints_api', __name__, url_prefix='/api')
+api = Api(waypoints_api)
+
+
 
 # Simulated database
 groups = [
@@ -99,7 +104,3 @@ api.add_resource(Groups, '/api/groups/filter')
 api.add_resource(Channels, '/api/channels/filter')
 api.add_resource(Posts, '/api/post')
 api.add_resource(FilterPosts, '/api/posts/filter')
-
-# Run the app
-if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=8887, debug=True)
