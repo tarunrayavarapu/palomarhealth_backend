@@ -40,8 +40,8 @@ def get_channel_name_by_id(channel_id):
 # Resource: Groups
 class Groups(Resource):
     def post(self):
-        section_name = request.json.get('section_name', '')
-        if section_name == "Wellness Waypoints":
+        group_id = request.json.get('group_id', '')
+        if group_id == 1:
             return jsonify(groups)
         return jsonify({"message": "Section not found"}), 404
 
