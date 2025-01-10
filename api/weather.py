@@ -15,8 +15,6 @@ weather_api_url = 'https://api.api-ninjas.com/v1/weather?lat={}&lon={}'
 
 class WeatherAPI:
     
-    # define the api crud endpoints for the weather api
-    
     class _Weather(Resource):
         
         def get(self):
@@ -37,14 +35,15 @@ class WeatherAPI:
     api.add_resource(_Weather, '/weather')
 
 
-def get_weather_data(lat, long):
+def get_weather_data(lat, lon):
     
     # get the weather data for the latitude and longitude of a city
 
-    api_url = weather_api_url.format(lat, long)
+    api_url = weather_api_url.format(lat, lon)
     response = requests.get(api_url, headers={'X-Api-Key': api_key})
     
     if response.status_code == requests.codes.ok:
-        print(response.text)
+        return response.json()
     else:
         print("Error:", response.status_code, response.text)
+        return None
