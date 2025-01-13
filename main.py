@@ -28,9 +28,13 @@ from api.messages_api import messages_api # Adi added this, messages for his web
 from api.carphoto import car_api
 from api.carChat import car_chat_api
 from api.weather import weather_api
+<<<<<<< HEAD
 from api.currency import currency_api
 from api.waypoints import waypoints_api
 from api.flight_api import flight_api
+=======
+from api.food_review import food_review_api
+>>>>>>> 030d507 (food review)
 
 from api.vote import vote_api
 
@@ -72,9 +76,13 @@ app.register_blueprint(nestImg_api)
 app.register_blueprint(vote_api)
 app.register_blueprint(car_api)
 app.register_blueprint(weather_api)
+<<<<<<< HEAD
 app.register_blueprint(currency_api)
 app.register_blueprint(waypoints_api)
 app.register_blueprint(flight_api)
+=======
+app.register_blueprint(food_review_api)
+>>>>>>> 030d507 (food review)
 
 app.register_blueprint(kiruthic_api)
 app.register_blueprint(aadi_api)
@@ -260,4 +268,4 @@ app.cli.add_command(custom_cli)
 # this runs the flask application on the development server
 if __name__ == "__main__":
     # change name for testing
-    app.run(debug=True, host="0.0.0.0", port="8887")
+    app.run(debug=True, host="0.0.0.0", port="6789")
