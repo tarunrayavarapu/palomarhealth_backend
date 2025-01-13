@@ -29,6 +29,7 @@ from api.carChat import car_chat_api
 from api.weather import weather_api
 from api.currency import currency_api
 from api.waypoints import waypoints_api
+from api.flight_api import flight_api
 
 from api.vote import vote_api
 
@@ -72,6 +73,7 @@ app.register_blueprint(car_api)
 app.register_blueprint(weather_api)
 app.register_blueprint(currency_api)
 app.register_blueprint(waypoints_api)
+app.register_blueprint(flight_api)
 
 app.register_blueprint(kiruthic_api)
 app.register_blueprint(aadi_api)
