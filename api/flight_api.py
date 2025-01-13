@@ -10,7 +10,7 @@ api = Api(flight_api)
 
 base_flight_api_url = 'https://api.aviationstack.com/v1/flights'
 
-api_key = 'e57e129b3e76d1dc706a05dc1e776b40'
+access_key = 'e57e129b3e76d1dc706a05dc1e776b40'
 class FlightAPI:
     
     class _Flight(Resource):
@@ -19,7 +19,7 @@ class FlightAPI:
             
             origin = request.args.get('origin', 'JFK')
             destination = request.args.get('destination', 'LAX')
-            flight_data = get_flight_data(origin, destination, api_key)
+            flight_data = get_flight_data(origin, destination, access_key)
 
             if flight_data:
                 return jsonify(flight_data)
@@ -30,14 +30,12 @@ class FlightAPI:
     api.add_resource(_Flight, '/flight')
 
 
-def get_flight_data(origin, destination, api_key):
-    
-
-    api_url = base_flight_api_url.format(origin, destination, api_key)
+def get_flight_data(origin, destination, access_key):
+    api_url = f"{base_flight_api_url}?access_key={access_key}&dep_iata={origin}&arr_iata={destination}"
     response = requests.get(api_url)
     
     if response.status_code == requests.codes.ok:
-        return response.json
+        return response.json()  # Correctly call the json method
     else:
         print("Error:", response.status_code, response.text)
         return None
