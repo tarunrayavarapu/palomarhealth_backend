@@ -14,6 +14,7 @@ class FoodReviewAPI:
             """
             Retrieve all food reviews.
             """
+            print("testing")
             return jsonify(reviews)
 
         def post(self):
