@@ -26,7 +26,7 @@ channels = {
     ]
 }
 
-posts = []  # List to store user posts
+waypoints = []  # List to store user waypoints
 
 
 class WaypointsAPI:
@@ -63,37 +63,37 @@ class WaypointsAPI:
                 return jsonify(channels[group_name])
             return jsonify({"message": "Group not found"}), 404
 
-    class Posts(Resource):
+    class Waypoints(Resource):
         """
-        Resource for adding a new post.
+        Resource for adding a new waypoint.
         """
         def post(self):
-            post_data = request.json
-            title = post_data.get('title')
-            comment = post_data.get('comment')
-            channel_id = post_data.get('channel_id')
+            waypoints_data = request.json
+            title = waypoints_data.get('title')
+            comment = waypoints_data.get('comment')
+            channel_id = waypoints_data.get('channel_id')
 
             if title and comment and channel_id:
                 channel_name = WaypointsAPI.get_channel_name_by_id(channel_id)
                 if not channel_name:
                     return jsonify({"success": False, "message": "Channel not found."}), 404
 
-                new_post = {
-                    "id": len(posts) + 1,
+                new_waypoint = {
+                    "id": len(waypoints) + 1,
                     "title": title,
                     "comment": comment,
                     "channel_name": channel_name,
                     "user_name": "Anonymous"
                 }
-                posts.append(new_post)
-                return jsonify({"success": True, "message": "Post added successfully."}), 201
+                waypoints.append(new_waypoint)
+                return jsonify({"success": True, "message": "Waypoints added successfully."}), 201
             return jsonify({"success": False, "message": "Invalid data provided."}), 400
 
-    class FilterPosts(Resource):
+    class FilterWaypoints(Resource):
         """
-        Resource for fetching posts by channel.
+        Resource for fetching waypoints by channel.
         """
-        def post(self):
+        def waypoint(self):
             channel_id = request.json.get('channel_id')
             if not channel_id:
                 return jsonify({"success": False, "message": "Channel ID is required."}), 400
@@ -102,12 +102,13 @@ class WaypointsAPI:
             if not channel_name:
                 return jsonify({"success": False, "message": "Channel not found."}), 404
 
-            filtered_posts = [post for post in posts if post["channel_name"] == channel_name]
-            return jsonify(filtered_posts)
+            filtered_waypoints = [waypoint for waypoint in waypoints if waypoint["channel_name"] == channel_name]
+            return jsonify(filtered_waypoints)
 
 
 # Add Resources to API
 api.add_resource(WaypointsAPI.Groups, '/groups/filter')
 api.add_resource(WaypointsAPI.Channels, '/channels/filter')
-api.add_resource(WaypointsAPI.Posts, '/post')
-api.add_resource(WaypointsAPI.FilterPosts, '/posts/filter')
+api.add_resource(WaypointsAPI.Waypoints, '/waypoints')
+api.add_resource(WaypointsAPI.FilterWaypoints, '/waypoints/filter')
+

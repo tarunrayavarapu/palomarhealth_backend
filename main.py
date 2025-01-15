@@ -47,6 +47,7 @@ from model.channel import Channel, initChannels
 from model.post import Post, initPosts
 from model.nestPost import NestPost, initNestPosts # Justin added this, custom format for his website
 from model.vote import Vote, initVotes
+from model.waypoints import Waypoints, initWaypoints
 
 from api.travel.kiruthic import *
 from api.travel.aadi import *
@@ -193,6 +194,7 @@ def generate_data():
     initPosts()
     initNestPosts()
     initVotes()
+    initWaypoints()
     
 # Backup the old database
 def backup_database(db_uri, backup_uri):
@@ -214,6 +216,7 @@ def extract_data():
         data['groups'] = [group.read() for group in Group.query.all()]
         data['channels'] = [channel.read() for channel in Channel.query.all()]
         data['posts'] = [post.read() for post in Post.query.all()]
+        data['waypoints'] = [waypoints.read() for waypoints in Waypoints.query.all()]
     return data
 
 # Save extracted data to JSON files
