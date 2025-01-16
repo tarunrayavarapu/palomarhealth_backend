@@ -19,6 +19,7 @@ from api.user import user_api
 from api.pfp import pfp_api
 from api.nestImg import nestImg_api # Justin added this, custom format for his website
 from api.post import post_api
+from api.budgetReview import budget_review_api
 from api.channel import channel_api
 from api.group import group_api
 from api.section import section_api
@@ -41,6 +42,7 @@ from model.section import Section, initSections
 from model.group import Group, initGroups
 from model.channel import Channel, initChannels
 from model.post import Post, initPosts
+from model.budgetReview import BudgetReview, initBudgetReviews
 from model.nestPost import NestPost, initNestPosts # Justin added this, custom format for his website
 from model.vote import Vote, initVotes
 
@@ -62,6 +64,7 @@ app.register_blueprint(channel_api)
 app.register_blueprint(group_api)
 app.register_blueprint(section_api)
 app.register_blueprint(car_chat_api)
+app.register_blueprint(budget_review_api)
 
 # Added new files to create nestPosts, uses a different format than Mortensen and didn't want to touch his junk
 app.register_blueprint(nestPost_api)
@@ -182,7 +185,8 @@ def generate_data():
     initUsers()
     initSections()
     initGroups()
-    initChannels()
+    # initChannels()
+    initBudgetReviews()
     initPosts()
     initNestPosts()
     initVotes()
