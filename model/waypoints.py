@@ -194,9 +194,9 @@ def initWaypoints():
         db.create_all()
         """Tester data for table"""
         waypoints = [
-            Waypoints(title='Added Group and Channel Select', comment='The Home Page has a Section, on this page we can select Group and Channel to allow blog filtering', content={'type': 'announcement'}, user_id=1, channel_id=1),
-            Waypoints(title='JSON content saving through content"field in database', comment='You could add other dialogs to a waypoints that would allow custom data or even storing reference to uploaded images.', content={'type': 'announcement'}, user_id=1, channel_id=1),
-            Waypoints(title='Allows waypoints by different Users', comment='Different users seeing content is a key concept in social media.', content={'type': 'announcement'}, user_id=2, channel_id=1),
+            Waypoints(title='Broken Bone', comment='Hospital', content={'type': 'announcement'}, user_id=1, channel_id=1),
+            Waypoints(title='Bruise', comment='Pharmacy', content={'type': 'announcement'}, user_id=1, channel_id=1),
+            Waypoints(title='Sprained Ankle', comment='Recovery Center', content={'type': 'announcement'}, user_id=2, channel_id=1),
         ]
         
         for waypoints in waypoints:
