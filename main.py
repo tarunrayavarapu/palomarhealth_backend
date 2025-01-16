@@ -226,7 +226,7 @@ def extract_data():
         data['posts'] = [post.read() for post in Post.query.all()]
         data['waypoints'] = [waypoints.read() for waypoints in Waypoints.query.all()]
         data['flight'] = [flight_api.read() for flight in Flight.query.all()]
-        data['hotels'] = [hotel.read() for hotel in Hotel.query.all()]
+        data['hotel_data'] = [hotel.read() for hotel in Hotel.query.all()]
     return data
 
 # Save extracted data to JSON files

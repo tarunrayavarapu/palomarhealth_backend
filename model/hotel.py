@@ -7,13 +7,14 @@ from __init__ import app, db
 
 class Hotel(db.Model):
 
-    __tablename__ = 'hotels'
+    __tablename__ = 'hotel_data'
 
     id = db.Column(db.Integer, primary_key=True)
+    hotel = db.Column(db.String(3), nullable=False)
     location = db.Column(db.String(3), nullable=False)
     rating = db.Column(db.String(3), nullable=False)
 
-    def __init__(self, hotel, location, rating=None):
+    def __init__(self, hotel, location, rating):
 
         self.hotel = hotel
         self.location = location
