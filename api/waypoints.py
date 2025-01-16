@@ -1,114 +1,153 @@
-from flask import Blueprint, request, jsonify
-from flask_restful import Api, Resource
+import jwt
+from flask import Blueprint, request, jsonify, current_app, Response, g
+from flask_restful import Api, Resource  # used for REST API building
+from datetime import datetime
+from __init__ import app
+from api.jwt_authorize import token_required
+from model.waypoints import Waypoints
+from model.channel import Channel
 
-# Initialize Blueprint and API for waypoints
+"""
+This Blueprint object is used to define APIs for the Waypoint model.
+- Blueprint is used to modularize application files.
+- This Blueprint is registered to the Flask app in main.py.
+"""
 waypoints_api = Blueprint('waypoints_api', __name__, url_prefix='/api')
+
+"""
+The Api object is connected to the Blueprint object to define the API endpoints.
+- The API object is used to add resources to the API.
+- The objects added are mapped to code that contains the actions for the API.
+- For more information, refer to the API docs: https://flask-restful.readthedocs.io/en/latest/api.html
+"""
 api = Api(waypoints_api)
 
-# Simulated database
-groups = [
-    {"id": 1, "name": "Fractures"},
-    {"id": 2, "name": "Burns"},
-    {"id": 3, "name": "Allergic Reactions"},
-    {"id": 4, "name": "Head Injuries"},
-    {"id": 5, "name": "Muscle Strains"}
-]
-
-channels = {
-    "Fractures": [
-        {"id": 1, "name": "Saint Louis Hospital"},
-        {"id": 2, "name": "Central Clinic"},
-        {"id": 3, "name": "Necker Hospital"}
-    ],
-    "Burns": [
-        {"id": 4, "name": "Georges Pompidou Hospital"},
-        {"id": 5, "name": "Pitié-Salpêtrière Hospital"}
-    ]
-}
-
-waypoints = []  # List to store user waypoints
-
-
-class WaypointsAPI:
+class WaypointAPI:
     """
-    Class encapsulating Waypoints API resources.
+    Define the API CRUD endpoints for the Waypoint model.
+    There are four operations that correspond to common HTTP methods:
+    - waypoint: create a new waypoint
+    - get: read waypoints
+    - put: update a waypoint
+    - delete: delete a waypoint
     """
-    
-    # Utility function to find channel name by ID
-    @staticmethod
-    def get_channel_name_by_id(channel_id):
-        for group_channels in channels.values():
-            for channel in group_channels:
-                if channel["id"] == channel_id:
-                    return channel["name"]
-        return None
-
-    class Groups(Resource):
-        """
-        Resource for fetching groups.
-        """
+    class _CRUD(Resource):
+        @token_required()
         def post(self):
-            section_name = request.json.get('section_name', '')
-            if section_name == "Wellness Waypoints":
-                return jsonify(groups)
-            return jsonify({"message": "Section not found"}), 404
+            """
+            Create a new waypoint.
+            """
+            # Obtain the current user from the token required setting in the global context
+            current_user = g.current_user
+            # Obtain the request data sent by the RESTful client API
+            data = request.get_json()
 
-    class Channels(Resource):
-        """
-        Resource for fetching channels by group name.
-        """
+            # Validate the presence of required keys
+            if not data:
+                return {'message': 'No input data provided'}, 400
+            if 'title' not in data:
+                return {'message': 'Waypoint title is required'}, 400
+            if 'comment' not in data:
+                return {'message': 'Waypoint comment is required'}, 400
+            if 'channel_id' not in data:
+                return {'message': 'Channel ID is required'}, 400
+            if 'content' not in data:
+                data['content'] = {}
+
+            # Create a new waypoint object using the data from the request
+            waypoint = Waypoints(data['title'], data['comment'], current_user.id, data['channel_id'], data['content'])
+            # Save the waypoint object using the Object Relational Mapper (ORM) method defined in the model
+            waypoint.create()
+            # Return response to the client in JSON format, converting Python dictionaries to JSON format
+            return jsonify(waypoint.read())
+
+        @token_required()
+        def get(self):
+            """
+            Retrieve a single waypoint by ID.
+            """
+            # Obtain and validate the request data sent by the RESTful client API
+            data = request.get_json()
+            if data is None:
+                return {'message': 'Waypoint data not found'}, 400
+            if 'id' not in data:
+                return {'message': 'Waypoint ID not found'}, 400
+            # Find the waypoint to read
+            waypoint = Waypoints.query.get(data['id'])
+            if waypoint is None:
+                return {'message': 'Waypoint not found'}, 404
+            # Convert Python object to JSON format 
+            json_ready = waypoint.read()
+            # Return a JSON restful response to the client
+            return jsonify(json_ready)
+
+        @token_required()
+        def put(self):
+            """
+            Update a waypoint.
+            """
+            # Obtain the current user
+            current_user = g.current_user
+            # Obtain the request data
+            data = request.get_json()
+            # Find the current waypoint from the database table(s)
+            waypoint = Waypoints.query.get(data['id'])
+            if waypoint is None:
+                return {'message': 'Waypoint not found'}, 404
+            # Update the waypoint
+            waypoint._title = data['title']
+            waypoint._content = data['content']
+            waypoint._channel_id = data['channel_id']
+            # Save the waypoint
+            waypoint.update()
+            # Return response
+            return jsonify(waypoint.read())
+
+        @token_required()
+        def delete(self):
+            """
+            Delete a waypoint.
+            """
+            # Obtain the current user
+            current_user = g.current_user
+            # Obtain the request data
+            data = request.get_json()
+            # Find the current waypoint from the database table(s)
+            waypoint = Waypoints.query.get(data['id'])
+            if waypoint is None:
+                return {'message': 'Waypoint not found'}, 404
+            # Delete the waypoint using the ORM method defined in the model
+            waypoint.delete()
+            # Return response
+            return jsonify({"message": "Waypoint deleted"})
+
+    class _FILTER(Resource):
+        @token_required()
         def post(self):
-            group_name = request.json.get('group_name', '')
-            if group_name in channels:
-                return jsonify(channels[group_name])
-            return jsonify({"message": "Group not found"}), 404
+            """
+            Retrieve all waypoints by channel ID and user ID.
+            """
+            # Obtain and validate the request data sent by the RESTful client API
+            data = request.get_json()
+            if data is None:
+                return {'message': 'Channel and User data not found'}, 400
+            if 'channel_id' not in data:
+                return {'message': 'Channel ID not found'}, 400
+            
+            # Find all waypoints by channel ID and user ID
+            waypoints = Waypoints.query.filter_by(_channel_id=data['channel_id']).all()
+            # Prepare a JSON list of all the waypoints, using list comprehension
+            json_ready = [waypoint.read() for waypoint in waypoints]
+            # Return a JSON list, converting Python dictionaries to JSON format
+            return jsonify(json_ready)
 
-    class Waypoints(Resource):
-        """
-        Resource for adding a new waypoint.
-        """
-        def post(self):
-            waypoints_data = request.json
-            title = waypoints_data.get('title')
-            comment = waypoints_data.get('comment')
-            channel_id = waypoints_data.get('channel_id')
-
-            if title and comment and channel_id:
-                channel_name = WaypointsAPI.get_channel_name_by_id(channel_id)
-                if not channel_name:
-                    return jsonify({"success": False, "message": "Channel not found."}), 404
-
-                new_waypoint = {
-                    "id": len(waypoints) + 1,
-                    "title": title,
-                    "comment": comment,
-                    "channel_name": channel_name,
-                    "user_name": "Anonymous"
-                }
-                waypoints.append(new_waypoint)
-                return jsonify({"success": True, "message": "Waypoints added successfully."}), 201
-            return jsonify({"success": False, "message": "Invalid data provided."}), 400
-
-    class FilterWaypoints(Resource):
-        """
-        Resource for fetching waypoints by channel.
-        """
-        def waypoint(self):
-            channel_id = request.json.get('channel_id')
-            if not channel_id:
-                return jsonify({"success": False, "message": "Channel ID is required."}), 400
-
-            channel_name = WaypointsAPI.get_channel_name_by_id(channel_id)
-            if not channel_name:
-                return jsonify({"success": False, "message": "Channel not found."}), 404
-
-            filtered_waypoints = [waypoint for waypoint in waypoints if waypoint["channel_name"] == channel_name]
-            return jsonify(filtered_waypoints)
-
-
-# Add Resources to API
-api.add_resource(WaypointsAPI.Groups, '/groups/filter')
-api.add_resource(WaypointsAPI.Channels, '/channels/filter')
-api.add_resource(WaypointsAPI.Waypoints, '/waypoints')
-api.add_resource(WaypointsAPI.FilterWaypoints, '/waypoints/filter')
-
+    """
+    Map the _CRUD, _USER, _BULK_CRUD, and _FILTER classes to the API endpoints for /waypoint, /waypoint/user, /waypoints, and /waypoints/filter.
+    - The API resource class inherits from flask_restful.Resource.
+    - The _CRUD class defines the HTTP methods for the API.
+    - The _USER class defines the endpoints for retrieving waypoints by the current user.
+    - The _BULK_CRUD class defines the bulk operations for the API.
+    - The _FILTER class defines the endpoints for filtering waypoints by channel ID and user ID.
+    """
+    api.add_resource(_CRUD, '/waypoints')
+    api.add_resource(_FILTER, '/waypoints/filter')

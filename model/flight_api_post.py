@@ -70,6 +70,15 @@ class Flight(db.Model):
             "departure_iata": self.departure_iata,
             "arrival_iata": self.arrival_iata,
         }
+        
+    def update(self, data):
+        self.departure_iata = data.get('dep_iata', self.departure_iata)
+        self.arrival_iata = data.get('arr_iata', self.arrival_iata)
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
     
     def delete(self):
         """

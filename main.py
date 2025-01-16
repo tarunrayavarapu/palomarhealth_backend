@@ -33,7 +33,6 @@ from api.currency import currency_api
 from api.waypoints import waypoints_api
 from api.flight_api import flight_api
 from api.food_review import food_review_api
-from api.hotel import hotel_api
 
 from api.vote import vote_api
 
@@ -53,6 +52,7 @@ from model.vote import Vote, initVotes
 from model.waypoints import Waypoints, initWaypoints
 from model.flight_api_post import Flight, initFlights
 from model.hotel import Hotel, initHotel
+from model.packingChecklist import packingChecklist, initPackingChecklist
 
 from api.travel.kiruthic import *
 from api.travel.aadi import *
@@ -84,7 +84,6 @@ app.register_blueprint(currency_api)
 app.register_blueprint(waypoints_api)
 app.register_blueprint(flight_api)
 app.register_blueprint(food_review_api)
-app.register_blueprint(hotel_api)
 
 app.register_blueprint(kiruthic_api)
 app.register_blueprint(aadi_api)
@@ -205,6 +204,7 @@ def generate_data():
     initWaypoints()
     initFlights()
     initHotel()
+    initPackingChecklist()
     
 # Backup the old database
 def backup_database(db_uri, backup_uri):
@@ -229,6 +229,7 @@ def extract_data():
         data['waypoints'] = [waypoints.read() for waypoints in Waypoints.query.all()]
         # data['flight'] = [flight_api.read() for flight in Flight.query.all()]
         data['hotel_data'] = [hotel.read() for hotel in Hotel.query.all()]
+        data['packing_checklists'] = [item.read() for item in packingChecklist.query.all()]
     return data
 
 # Save extracted data to JSON files
