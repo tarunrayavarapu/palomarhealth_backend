@@ -4,14 +4,14 @@ from sqlalchemy import Text, Integer, String, DateTime
 from sqlalchemy.exc import IntegrityError
 from __init__ import app, db
 from model.user import User
-from model.channel import Channel
+from model.group import Group 
 from datetime import datetime
 
 class BudgetReview(db.Model):
     """
     BudgetReview Model
     
-    The BudgetReview class represents an individual review of a budget by a user within a specific channel.
+    The BudgetReview class represents an individual review of a budget by a user within a specific group.
     
     Attributes:
         id (db.Column): The primary key, an integer representing the unique identifier for the review.
@@ -21,7 +21,7 @@ class BudgetReview(db.Model):
         _hashtag (db.Column): A string representing associated hashtags with the review.
         _date (db.Column): A datetime representing when the review was created.
         _user_id (db.Column): An integer representing the user who created the review.
-        _channel_id (db.Column): An integer representing the channel to which the review belongs.
+        _group_id (db.Column): An integer representing the group to which the review belongs.
     """
     __tablename__ = 'budget_reviews'
 
@@ -32,9 +32,9 @@ class BudgetReview(db.Model):
     _hashtag = db.Column(db.String(255), nullable=True)
     _date = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     _user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    _channel_id = db.Column(db.Integer, db.ForeignKey('channels.id'), nullable=False)
+    _group_id = db.Column(db.Integer, db.ForeignKey('groups.id'), nullable=False) 
 
-    def __init__(self, title, comment, rating, hashtag=None, date=None, user_id=None, channel_id=None):
+    def __init__(self, title, comment, rating, hashtag=None, date=None, user_id=None, group_id=None):
         """
         Constructor for BudgetReview object creation.
         
@@ -45,7 +45,7 @@ class BudgetReview(db.Model):
             hashtag (str): Optional field for hashtags.
             date (datetime): The date of the review (defaults to current time).
             user_id (int): The ID of the user who created the review.
-            channel_id (int): The ID of the channel to which the review belongs.
+            group_id (int): The ID of the group to which the review belongs (instead of channel).
         """
         self._title = title
         self._comment = comment
@@ -53,7 +53,7 @@ class BudgetReview(db.Model):
         self._hashtag = hashtag
         self._date = date or datetime.utcnow()  # default to current time if not provided
         self._user_id = user_id
-        self._channel_id = channel_id
+        self._group_id = group_id 
 
     def __repr__(self):
         """
@@ -62,7 +62,7 @@ class BudgetReview(db.Model):
         Returns:
             str: A string representation of the BudgetReview object.
         """
-        return f"BudgetReview(id={self.id}, title={self._title}, comment={self._comment}, rating={self._rating}, hashtag={self._hashtag}, date={self._date}, user_id={self._user_id}, channel_id={self._channel_id})"
+        return f"BudgetReview(id={self.id}, title={self._title}, comment={self._comment}, rating={self._rating}, hashtag={self._hashtag}, date={self._date}, user_id={self._user_id}, group_id={self._group_id})"  # Changed to group_id
 
     def create(self):
         """
@@ -85,10 +85,10 @@ class BudgetReview(db.Model):
         Retrieves the budget review data and returns it as a dictionary.
         
         Returns:
-            dict: A dictionary containing the review data, including user and channel names.
+            dict: A dictionary containing the review data, including user and group names.
         """
         user = User.query.get(self._user_id)
-        channel = Channel.query.get(self._channel_id)
+        group = Group.query.get(self._group_id)  
         data = {
             "id": self.id,
             "title": self._title,
@@ -97,7 +97,7 @@ class BudgetReview(db.Model):
             "hashtag": self._hashtag,
             "date": self._date,
             "user_name": user.name if user else None,
-            "channel_name": channel.name if channel else None
+            "group_name": group.name if group else None 
         }
         return data
 
@@ -118,7 +118,7 @@ class BudgetReview(db.Model):
         rating = inputs._rating
         hashtag = inputs._hashtag
         date = inputs._date
-        channel_id = inputs._channel_id
+        group_id = inputs._group_id 
         user_id = inputs._user_id
 
         # Update fields if new data is provided
@@ -132,8 +132,8 @@ class BudgetReview(db.Model):
             self._hashtag = hashtag
         if date:
             self._date = date
-        if channel_id:
-            self._channel_id = channel_id
+        if group_id:
+            self._group_id = group_id 
         if user_id:
             self._user_id = user_id
 
@@ -161,14 +161,14 @@ class BudgetReview(db.Model):
 
 def initBudgetReviews():
     """
-    Initializes the BudgetReview table and adds test data to the table.
+    Initializes the BudgetReview table and adds test data to the table, with categories for food, activity, and hotel.
     """
     with app.app_context():
         db.create_all()
         budget_reviews = [
-            BudgetReview(title='Marketing Budget Review', comment='Reviewing the Q1 marketing budget allocation.', rating=4, hashtag='marketing', user_id=1, channel_id=1),
-            BudgetReview(title='Sales Budget Review', comment='Reviewing the Q1 sales budget allocation.', rating=5, hashtag='sales', user_id=2, channel_id=1),
-            BudgetReview(title='Tech Budget Review', comment='Reviewing the Q1 tech budget allocation.', rating=3, hashtag='tech', user_id=1, channel_id=2),
+            BudgetReview(title='Test Food Review', comment='Reviewing the new restaurant menu for Q1.', rating=4, hashtag='food', user_id=1, group_id=1),
+            BudgetReview(title='Test Activity Review', comment='Reviewing the new hiking trail experience in Q1.', rating=5, hashtag='activity', user_id=2, group_id=2),
+            BudgetReview(title='Test Hotel Review', comment='Reviewing the Q1 hotel stay for a corporate event.', rating=3, hashtag='hotel', user_id=1, group_id=3),
         ]
         
         for review in budget_reviews:

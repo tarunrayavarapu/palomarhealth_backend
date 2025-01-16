@@ -36,9 +36,9 @@ class BudgetReviewAPI:
             if 'rating' not in data:
                 return {'message': 'Budget review rating is required'}, 400
             if 'hashtag' not in data:
-                data['hashtag'] = None  # Optional field, default to None
+                return {'message': 'Budget review hashtag is required'}, 400
             if 'date' not in data:
-                data['date'] = datetime.utcnow().isoformat()  # Optional field, default to current time
+                return {'message': 'Budget review date is required'}, 400
 
             # Create the BudgetReview object with the provided data
             budget_review = BudgetReview(
@@ -84,8 +84,8 @@ class BudgetReviewAPI:
             budget_review._title = data['title']
             budget_review._comment = data['comment']
             budget_review._rating = data['rating']
-            budget_review._hashtag = data.get('hashtag', budget_review._hashtag)  # optional, defaults to previous value
-            budget_review._date = data.get('date', budget_review._date)  # optional, defaults to previous value
+            budget_review._hashtag = data.get('hashtag', budget_review._hashtag)
+            budget_review._date = data.get('date', budget_review._date)
             budget_review._channel_id = data['channel_id']
 
             # Save the updated BudgetReview object
