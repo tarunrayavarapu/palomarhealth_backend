@@ -19,7 +19,6 @@ class BudgetReview(db.Model):
         _comment (db.Column): A string representing the comment of the review.
         _rating (db.Column): An integer representing the rating given to the review.
         _hashtag (db.Column): A string representing associated hashtags with the review.
-        _date (db.Column): A datetime representing when the review was created.
         _user_id (db.Column): An integer representing the user who created the review.
         _group_id (db.Column): An integer representing the group to which the review belongs.
     """
@@ -30,11 +29,10 @@ class BudgetReview(db.Model):
     _comment = db.Column(db.String(255), nullable=False)
     _rating = db.Column(db.Integer, nullable=False)
     _hashtag = db.Column(db.String(255), nullable=True)
-    _date = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     _user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     _group_id = db.Column(db.Integer, db.ForeignKey('groups.id'), nullable=False) 
 
-    def __init__(self, title, comment, rating, hashtag=None, date=None, user_id=None, group_id=None):
+    def __init__(self, title, comment, rating, hashtag=None, user_id=None, group_id=None):
         """
         Constructor for BudgetReview object creation.
         
@@ -43,7 +41,6 @@ class BudgetReview(db.Model):
             comment (str): The comment describing the review.
             rating (int): The rating given to the budget review.
             hashtag (str): Optional field for hashtags.
-            date (datetime): The date of the review (defaults to current time).
             user_id (int): The ID of the user who created the review.
             group_id (int): The ID of the group to which the review belongs (instead of channel).
         """
@@ -51,7 +48,6 @@ class BudgetReview(db.Model):
         self._comment = comment
         self._rating = rating
         self._hashtag = hashtag
-        self._date = date or datetime.utcnow()  # default to current time if not provided
         self._user_id = user_id
         self._group_id = group_id 
 
@@ -62,7 +58,7 @@ class BudgetReview(db.Model):
         Returns:
             str: A string representation of the BudgetReview object.
         """
-        return f"BudgetReview(id={self.id}, title={self._title}, comment={self._comment}, rating={self._rating}, hashtag={self._hashtag}, date={self._date}, user_id={self._user_id}, group_id={self._group_id})"  # Changed to group_id
+        return f"BudgetReview(id={self.id}, title={self._title}, comment={self._comment}, rating={self._rating}, hashtag={self._hashtag}, user_id={self._user_id}, group_id={self._group_id})"  # Changed to group_id
 
     def create(self):
         """
@@ -95,7 +91,6 @@ class BudgetReview(db.Model):
             "comment": self._comment,
             "rating": self._rating,
             "hashtag": self._hashtag,
-            "date": self._date,
             "user_name": user.name if user else None,
             "group_name": group.name if group else None 
         }
@@ -117,7 +112,6 @@ class BudgetReview(db.Model):
         comment = inputs._comment
         rating = inputs._rating
         hashtag = inputs._hashtag
-        date = inputs._date
         group_id = inputs._group_id 
         user_id = inputs._user_id
 
@@ -130,8 +124,6 @@ class BudgetReview(db.Model):
             self._rating = rating
         if hashtag:
             self._hashtag = hashtag
-        if date:
-            self._date = date
         if group_id:
             self._group_id = group_id 
         if user_id:
