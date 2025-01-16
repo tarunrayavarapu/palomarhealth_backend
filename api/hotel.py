@@ -37,7 +37,7 @@ class HotelAPI:
 
                 hotel = Hotel.query.get(hotel_id)
                 if not hotel:
-                    return {'message': 'Hote not found'}, 404
+                    return {'message': 'Hotel not found'}, 404
                 return jsonify(hotel.read())
 
             all_hotels = Hotel.query.all()
