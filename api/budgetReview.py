@@ -5,7 +5,7 @@ from datetime import datetime
 from __init__ import app
 from api.jwt_authorize import token_required
 from model.budgetReview import BudgetReview
-from model.channel import Channel
+from model.group import Group 
 
 """
 Define the API CRUD endpoints
@@ -31,14 +31,12 @@ class BudgetReviewAPI:
                 return {'message': 'Budget review title is required'}, 400
             if 'comment' not in data:
                 return {'message': 'Budget review comment is required'}, 400
-            if 'channel_id' not in data:
-                return {'message': 'Channel ID is required'}, 400
+            if 'group_id' not in data: 
+                return {'message': 'Group ID is required'}, 400
             if 'rating' not in data:
                 return {'message': 'Budget review rating is required'}, 400
             if 'hashtag' not in data:
                 return {'message': 'Budget review hashtag is required'}, 400
-            if 'date' not in data:
-                return {'message': 'Budget review date is required'}, 400
 
             # Create the BudgetReview object with the provided data
             budget_review = BudgetReview(
@@ -46,9 +44,8 @@ class BudgetReviewAPI:
                 data['comment'], 
                 data['rating'], 
                 data['hashtag'], 
-                data['date'], 
                 current_user.id, 
-                data['channel_id']
+                data['group_id']  
             )
             # Save the BudgetReview object
             budget_review.create()
@@ -85,8 +82,7 @@ class BudgetReviewAPI:
             budget_review._comment = data['comment']
             budget_review._rating = data['rating']
             budget_review._hashtag = data.get('hashtag', budget_review._hashtag)
-            budget_review._date = data.get('date', budget_review._date)
-            budget_review._channel_id = data['channel_id']
+            budget_review._group_id = data['group_id']  
 
             # Save the updated BudgetReview object
             budget_review.update()
@@ -156,13 +152,13 @@ class BudgetReviewAPI:
         @token_required()
         def post(self):
             """
-            Retrieve budget reviews by channel ID and user ID.
+            Retrieve budget reviews by group ID and user ID.
             """
             data = request.get_json()
-            if 'channel_id' not in data:
-                return {'message': 'Channel ID not found'}, 400
+            if 'group_id' not in data:  
+                return {'message': 'Group ID not found'}, 400
 
-            budget_reviews = BudgetReview.query.filter_by(_channel_id=data['channel_id']).all()
+            budget_reviews = BudgetReview.query.filter_by(_group_id=data['group_id']).all()  
             json_ready = [budget_review.read() for budget_review in budget_reviews]
             return jsonify(json_ready)
 

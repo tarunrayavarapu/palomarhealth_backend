@@ -15,7 +15,7 @@ class HotelAPI:
             data = request.get_json()
 
             if not data or 'hotel' not in data or 'location' not in data or 'rating' not in data:
-                return {'message': 'Subject and teacher(s) are required'}, 400
+                return {'message': 'Hotel, location, and rating are required'}, 400
 
             hotel = Hotel(
                 hotel=data.get('hotel'),
@@ -37,7 +37,7 @@ class HotelAPI:
 
                 hotel = Hotel.query.get(hotel_id)
                 if not hotel:
-                    return {'message': 'Hote not found'}, 404
+                    return {'message': 'Hotel not found'}, 404
                 return jsonify(hotel.read())
 
             all_hotels = Hotel.query.all()
