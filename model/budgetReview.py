@@ -8,20 +8,6 @@ from model.group import Group
 from datetime import datetime
 
 class BudgetReview(db.Model):
-    """
-    BudgetReview Model
-    
-    The BudgetReview class represents an individual review of a budget by a user within a specific group.
-    
-    Attributes:
-        id (db.Column): The primary key, an integer representing the unique identifier for the review.
-        _title (db.Column): A string representing the title of the review.
-        _comment (db.Column): A string representing the comment of the review.
-        _rating (db.Column): An integer representing the rating given to the review.
-        _hashtag (db.Column): A string representing associated hashtags with the review.
-        _user_id (db.Column): An integer representing the user who created the review.
-        _group_id (db.Column): An integer representing the group to which the review belongs.
-    """
     __tablename__ = 'budget_reviews'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -35,14 +21,6 @@ class BudgetReview(db.Model):
     def __init__(self, title, comment, rating, hashtag=None, user_id=None, group_id=None):
         """
         Constructor for BudgetReview object creation.
-        
-        Args:
-            title (str): The title of the review.
-            comment (str): The comment describing the review.
-            rating (int): The rating given to the budget review.
-            hashtag (str): Optional field for hashtags.
-            user_id (int): The ID of the user who created the review.
-            group_id (int): The ID of the group to which the review belongs (instead of channel).
         """
         self._title = title
         self._comment = comment
@@ -52,21 +30,9 @@ class BudgetReview(db.Model):
         self._group_id = group_id 
 
     def __repr__(self):
-        """
-        The __repr__ method returns a string representation of the BudgetReview instance.
-        
-        Returns:
-            str: A string representation of the BudgetReview object.
-        """
         return f"BudgetReview(id={self.id}, title={self._title}, comment={self._comment}, rating={self._rating}, hashtag={self._hashtag}, user_id={self._user_id}, group_id={self._group_id})"  # Changed to group_id
 
     def create(self):
-        """
-        Creates a new budget review in the database.
-        
-        Returns:
-            BudgetReview: The created review object, or None on error.
-        """
         try:
             db.session.add(self)
             db.session.commit()
@@ -77,12 +43,6 @@ class BudgetReview(db.Model):
         return self
         
     def read(self):
-        """
-        Retrieves the budget review data and returns it as a dictionary.
-        
-        Returns:
-            dict: A dictionary containing the review data, including user and group names.
-        """
         user = User.query.get(self._user_id)
         group = Group.query.get(self._group_id)  
         data = {
@@ -97,15 +57,6 @@ class BudgetReview(db.Model):
         return data
 
     def update(self):
-        """
-        Updates the budget review object with new data.
-        
-        Args:
-            inputs (dict): A dictionary containing the new data for the review.
-        
-        Returns:
-            BudgetReview: The updated review object, or None on error.
-        """
         inputs = BudgetReview.query.get(self.id)
         
         title = inputs._title
@@ -115,7 +66,6 @@ class BudgetReview(db.Model):
         group_id = inputs._group_id 
         user_id = inputs._user_id
 
-        # Update fields if new data is provided
         if title:
             self._title = title
         if comment:
@@ -138,12 +88,6 @@ class BudgetReview(db.Model):
         return self
     
     def delete(self):
-        """
-        Deletes the budget review from the database.
-        
-        Raises:
-            Exception: An error occurred when deleting the review.
-        """    
         try:
             db.session.delete(self)
             db.session.commit()
@@ -151,10 +95,24 @@ class BudgetReview(db.Model):
             db.session.rollback()
             raise e
 
+    @staticmethod
+    def restore(data):
+        for review_data in data:
+            _ = review_data.pop('id', None)
+            group_name = review_data.get("group", None)
+            group = Group.query.filter_by(name=group_name).first()
+            if group:
+                budget_review = BudgetReview(
+                    review_data['title'],
+                    review_data['comment'],
+                    review_data['rating'],
+                    review_data.get('hashtag', None),
+                    review_data['user_id'],
+                    group.id
+                )
+                budget_review.create()
+    
 def initBudgetReviews():
-    """
-    Initializes the BudgetReview table and adds test data to the table, with categories for food, activity, and hotel.
-    """
     with app.app_context():
         db.create_all()
         budget_reviews = [
