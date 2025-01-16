@@ -1,13 +1,9 @@
 from flask import Blueprint, request, jsonify
 from flask_restful import Api, Resource
-from flask import Flask
-import json
-import requests
 
+# Initialize Blueprint and API for waypoints
 waypoints_api = Blueprint('waypoints_api', __name__, url_prefix='/api')
 api = Api(waypoints_api)
-
-
 
 # Simulated database
 groups = [
@@ -30,77 +26,89 @@ channels = {
     ]
 }
 
-posts = []  # List to store user posts
+waypoints = []  # List to store user waypoints
 
 
-# Utility function to find channel name by ID
-def get_channel_name_by_id(channel_id):
-    for group_channels in channels.values():
-        for channel in group_channels:
-            if channel["id"] == channel_id:
-                return channel["name"]
-    return None
+class WaypointsAPI:
+    """
+    Class encapsulating Waypoints API resources.
+    """
+    
+    # Utility function to find channel name by ID
+    @staticmethod
+    def get_channel_name_by_id(channel_id):
+        for group_channels in channels.values():
+            for channel in group_channels:
+                if channel["id"] == channel_id:
+                    return channel["name"]
+        return None
 
+    class Groups(Resource):
+        """
+        Resource for fetching groups.
+        """
+        def post(self):
+            section_name = request.json.get('section_name', '')
+            if section_name == "Wellness Waypoints":
+                return jsonify(groups)
+            return jsonify({"message": "Section not found"}), 404
 
-# Resource: Groups
-class Groups(Resource):
-    def post(self):
-        group_id = request.json.get('group_id', '')
-        if group_id == 1:
-            return jsonify(groups)
-        return jsonify({"message": "Section not found"}), 404
+    class Channels(Resource):
+        """
+        Resource for fetching channels by group name.
+        """
+        def post(self):
+            group_name = request.json.get('group_name', '')
+            if group_name in channels:
+                return jsonify(channels[group_name])
+            return jsonify({"message": "Group not found"}), 404
 
+    class Waypoints(Resource):
+        """
+        Resource for adding a new waypoint.
+        """
+        def post(self):
+            waypoints_data = request.json
+            title = waypoints_data.get('title')
+            comment = waypoints_data.get('comment')
+            channel_id = waypoints_data.get('channel_id')
 
-# Resource: Channels
-class Channels(Resource):
-    def post(self):
-        group_name = request.json.get('group_name', '')
-        if group_name in channels:
-            return jsonify(channels[group_name])
-        return jsonify({"message": "Group not found"}), 404
+            if title and comment and channel_id:
+                channel_name = WaypointsAPI.get_channel_name_by_id(channel_id)
+                if not channel_name:
+                    return jsonify({"success": False, "message": "Channel not found."}), 404
 
+                new_waypoint = {
+                    "id": len(waypoints) + 1,
+                    "title": title,
+                    "comment": comment,
+                    "channel_name": channel_name,
+                    "user_name": "Anonymous"
+                }
+                waypoints.append(new_waypoint)
+                return jsonify({"success": True, "message": "Waypoints added successfully."}), 201
+            return jsonify({"success": False, "message": "Invalid data provided."}), 400
 
-# Resource: Posts
-class Posts(Resource):
-    def post(self):
-        post_data = request.json
-        title = post_data.get('title')
-        comment = post_data.get('comment')
-        channel_id = post_data.get('channel_id')
+    class FilterWaypoints(Resource):
+        """
+        Resource for fetching waypoints by channel.
+        """
+        def waypoint(self):
+            channel_id = request.json.get('channel_id')
+            if not channel_id:
+                return jsonify({"success": False, "message": "Channel ID is required."}), 400
 
-        if title and comment and channel_id:
-            channel_name = get_channel_name_by_id(channel_id)
+            channel_name = WaypointsAPI.get_channel_name_by_id(channel_id)
             if not channel_name:
                 return jsonify({"success": False, "message": "Channel not found."}), 404
 
-            new_post = {
-                "id": len(posts) + 1,
-                "title": title,
-                "comment": comment,
-                "channel_name": channel_name,
-                "user_name": "Anonymous"
-            }
-            posts.append(new_post)
-            return jsonify({"success": True, "message": "Post added successfully."}), 201
-        return jsonify({"success": False, "message": "Invalid data provided."}), 400
+            filtered_waypoints = [waypoint for waypoint in waypoints if waypoint["channel_name"] == channel_name]
+            return jsonify(filtered_waypoints)
 
 
-class FilterPosts(Resource):
-    def post(self):
-        channel_id = request.json.get('channel_id')
-        if not channel_id:
-            return jsonify({"success": False, "message": "Channel ID is required."}), 400
+# Add Resources to API
+api.add_resource(WaypointsAPI.Groups, '/groups/filter')
+api.add_resource(WaypointsAPI.Channels, '/channels/filter')
+api.add_resource(WaypointsAPI.Waypoints, '/waypoints')
+api.add_resource(WaypointsAPI.FilterWaypoints, '/waypoints/filter')
 
-        channel_name = get_channel_name_by_id(channel_id)
-        if not channel_name:
-            return jsonify({"success": False, "message": "Channel not found."}), 404
-
-        filtered_posts = [post for post in posts if post["channel_name"] == channel_name]
-        return jsonify(filtered_posts)
-
-
-# Register Resources
-api.add_resource(Groups, '/api/groups/filter')
-api.add_resource(Channels, '/api/channels/filter')
-api.add_resource(Posts, '/api/post')
-api.add_resource(FilterPosts, '/api/posts/filter')
