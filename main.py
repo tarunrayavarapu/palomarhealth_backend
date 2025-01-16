@@ -42,6 +42,7 @@ from model.channel import Channel, initChannels
 from model.post import Post, initPosts
 from model.nestPost import NestPost, initNestPosts # Justin added this, custom format for his website
 from model.vote import Vote, initVotes
+from model.hotel import Hotel, initHotel
 
 from api.travel.kiruthic import *
 from api.travel.aadi import *
@@ -50,6 +51,7 @@ from api.travel.aaditya import *
 from api.travel.arhaan import *
 from api.travel.tarun import *
 from api.travel.rohan import *
+from api.travel.hotels import *
 # server only Views
 
 # register URIs for api endpoints
@@ -75,6 +77,7 @@ app.register_blueprint(aaditya_api)
 app.register_blueprint(arhaan_api)
 app.register_blueprint(tarun_api)
 app.register_blueprint(rohan_api)
+app.register_blueprint(hotel_api)
 
 
 # Tell Flask-Login the view function name of your login route
@@ -179,10 +182,11 @@ def generate_data():
     initUsers()
     initSections()
     initGroups()
-    initChannels()
+    # initChannels()
     initPosts()
     initNestPosts()
     initVotes()
+    initHotel()
     
 # Backup the old database
 def backup_database(db_uri, backup_uri):
@@ -204,6 +208,7 @@ def extract_data():
         data['groups'] = [group.read() for group in Group.query.all()]
         data['channels'] = [channel.read() for channel in Channel.query.all()]
         data['posts'] = [post.read() for post in Post.query.all()]
+        data['my_hotels'] = [hotel.read() for hotel in Hotel.query.all()]
     return data
 
 # Save extracted data to JSON files
@@ -218,7 +223,7 @@ def save_data_to_json(data, directory='backup'):
 # Load data from JSON files
 def load_data_from_json(directory='backup'):
     data = {}
-    for table in ['users', 'sections', 'groups', 'channels', 'posts']:
+    for table in ['users', 'sections', 'groups', 'channels', 'posts', 'my_hotels']:
         with open(os.path.join(directory, f'{table}.json'), 'r') as f:
             data[table] = json.load(f)
     return data
@@ -231,6 +236,7 @@ def restore_data(data):
         _ = Group.restore(data['groups'], users)
         _ = Channel.restore(data['channels'])
         _ = Post.restore(data['posts'])
+        _ = Hotel.restore(data['my_hotels'])
     print("Data restored to the new database.")
 
 # Define a command to backup data
@@ -252,4 +258,4 @@ app.cli.add_command(custom_cli)
 # this runs the flask application on the development server
 if __name__ == "__main__":
     # change name for testing
-    app.run(debug=True, host="0.0.0.0", port="8887")
+    app.run(debug=True, host="0.0.0.0", port="5000")
