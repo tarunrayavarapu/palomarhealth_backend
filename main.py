@@ -9,6 +9,7 @@ from flask_login import current_user, login_required
 from flask import current_app
 from werkzeug.security import generate_password_hash
 import shutil
+from flask import Flask
 
 
 
@@ -29,6 +30,9 @@ from api.carphoto import car_api
 from api.carChat import car_chat_api
 from api.weather import weather_api
 from api.currency import currency_api
+from api.waypoints import waypoints_api
+from api.flight_api import flight_api
+from api.food_review import food_review_api
 
 from api.vote import vote_api
 
@@ -45,6 +49,7 @@ from model.post import Post, initPosts
 from model.budgetReview import BudgetReview, initBudgetReviews
 from model.nestPost import NestPost, initNestPosts # Justin added this, custom format for his website
 from model.vote import Vote, initVotes
+from model.waypoints import Waypoints, initWaypoints
 
 from api.travel.kiruthic import *
 from api.travel.aadi import *
@@ -73,6 +78,9 @@ app.register_blueprint(vote_api)
 app.register_blueprint(car_api)
 app.register_blueprint(weather_api)
 app.register_blueprint(currency_api)
+app.register_blueprint(waypoints_api)
+app.register_blueprint(flight_api)
+app.register_blueprint(food_review_api)
 
 app.register_blueprint(kiruthic_api)
 app.register_blueprint(aadi_api)
@@ -190,6 +198,7 @@ def generate_data():
     initPosts()
     initNestPosts()
     initVotes()
+    initWaypoints()
     
 # Backup the old database
 def backup_database(db_uri, backup_uri):
@@ -211,6 +220,7 @@ def extract_data():
         data['groups'] = [group.read() for group in Group.query.all()]
         data['channels'] = [channel.read() for channel in Channel.query.all()]
         data['posts'] = [post.read() for post in Post.query.all()]
+        data['waypoints'] = [waypoints.read() for waypoints in Waypoints.query.all()]
     return data
 
 # Save extracted data to JSON files
