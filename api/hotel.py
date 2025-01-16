@@ -15,7 +15,7 @@ class HotelAPI:
             data = request.get_json()
 
             if not data or 'hotel' not in data or 'location' not in data or 'rating' not in data:
-                return {'message': 'Subject and teacher(s) are required'}, 400
+                return {'message': 'Hotel, location, and rating are required'}, 400
 
             hotel = Hotel(
                 hotel=data.get('hotel'),
