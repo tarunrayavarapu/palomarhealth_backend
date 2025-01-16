@@ -1,4 +1,3 @@
-# group.py
 from sqlite3 import IntegrityError
 from __init__ import app, db
 from model.section import Section
@@ -167,7 +166,7 @@ def initGroups():
         """Create database and tables"""
         db.create_all()
         """Tester data for table"""
-        
+
         # Home Page Groups
         home_page_section = Section.query.filter_by(_name='Home Page').first()
         groups = [
@@ -227,6 +226,18 @@ def initGroups():
             Group(name='Flavor Fusion', section_id=rate_and_relate_section.id, moderators=[User.query.get(1)]),
             Group(name='Book Reviews', section_id=rate_and_relate_section.id, moderators=[User.query.get(1)]),
             Group(name='Update The Nest', section_id=rate_and_relate_section.id, moderators=[User.query.get(1)]),
+        ]
+
+        # New Section: Paris Food Section
+        paris_food_section = Section.query.filter_by(_name='Paris Food').first()
+        if not paris_food_section:
+            paris_food_section = Section(name='Paris Food')
+            db.session.add(paris_food_section)
+            db.session.commit()
+        
+        # New Group: Paris Food Group
+        groups += [
+            Group(name='Paris Food', section_id=paris_food_section.id, moderators=[User.query.get(1)])
         ]
 
         for group in groups:

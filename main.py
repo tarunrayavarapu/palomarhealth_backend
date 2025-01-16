@@ -9,6 +9,7 @@ from flask_login import current_user, login_required
 from flask import current_app
 from werkzeug.security import generate_password_hash
 import shutil
+from flask import Flask
 
 
 
@@ -19,6 +20,7 @@ from api.user import user_api
 from api.pfp import pfp_api
 from api.nestImg import nestImg_api # Justin added this, custom format for his website
 from api.post import post_api
+from api.budgetReview import budget_review_api
 from api.channel import channel_api
 from api.group import group_api
 from api.section import section_api
@@ -27,6 +29,10 @@ from api.messages_api import messages_api # Adi added this, messages for his web
 from api.carphoto import car_api
 from api.carChat import car_chat_api
 from api.weather import weather_api
+from api.currency import currency_api
+from api.waypoints import waypoints_api
+from api.flight_api import flight_api
+from api.food_review import food_review_api
 
 from api.vote import vote_api
 
@@ -40,9 +46,9 @@ from model.section import Section, initSections
 from model.group import Group, initGroups
 from model.channel import Channel, initChannels
 from model.post import Post, initPosts
+from model.budgetReview import BudgetReview, initBudgetReviews
 from model.nestPost import NestPost, initNestPosts # Justin added this, custom format for his website
 from model.vote import Vote, initVotes
-from model.hotel import Hotel, initHotel
 
 from api.travel.kiruthic import *
 from api.travel.aadi import *
@@ -63,12 +69,18 @@ app.register_blueprint(channel_api)
 app.register_blueprint(group_api)
 app.register_blueprint(section_api)
 app.register_blueprint(car_chat_api)
+app.register_blueprint(budget_review_api)
+
 # Added new files to create nestPosts, uses a different format than Mortensen and didn't want to touch his junk
 app.register_blueprint(nestPost_api)
 app.register_blueprint(nestImg_api)
 app.register_blueprint(vote_api)
 app.register_blueprint(car_api)
 app.register_blueprint(weather_api)
+app.register_blueprint(currency_api)
+app.register_blueprint(waypoints_api)
+app.register_blueprint(flight_api)
+app.register_blueprint(food_review_api)
 
 app.register_blueprint(kiruthic_api)
 app.register_blueprint(aadi_api)
@@ -182,11 +194,10 @@ def generate_data():
     initUsers()
     initSections()
     initGroups()
-    # initChannels()
+    initChannels()
     initPosts()
     initNestPosts()
     initVotes()
-    initHotel()
     
 # Backup the old database
 def backup_database(db_uri, backup_uri):
@@ -208,7 +219,6 @@ def extract_data():
         data['groups'] = [group.read() for group in Group.query.all()]
         data['channels'] = [channel.read() for channel in Channel.query.all()]
         data['posts'] = [post.read() for post in Post.query.all()]
-        data['my_hotels'] = [hotel.read() for hotel in Hotel.query.all()]
     return data
 
 # Save extracted data to JSON files
