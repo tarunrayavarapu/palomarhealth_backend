@@ -93,6 +93,19 @@ class Flight(db.Model):
         except Exception as e:
             db.session.rollback()
             raise e
+    
+    @staticmethod
+    def restore(data):
+        for flight_data in data:
+            _ = flight_data.pop('id', None)  # Remove 'id' from post_data
+            title = flight_data.get("departure_iata", None)
+            flight = Flight.query.filter_by(departure_iata=title).first()
+            if flight:
+                flight.update(flight_data)
+            else:
+                flight = Flight(**flight_data)
+                flight.update(flight_data)
+                flight.create()
 
 
 def initFlights():
