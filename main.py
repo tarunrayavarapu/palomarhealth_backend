@@ -227,7 +227,7 @@ def extract_data():
         data['channels'] = [channel.read() for channel in Channel.query.all()]
         data['posts'] = [post.read() for post in Post.query.all()]
         data['waypoints'] = [waypoints.read() for waypoints in Waypoints.query.all()]
-        data['flight'] = [flight_api.read() for flight in Flight.query.all()]
+        # data['flight'] = [flight_api.read() for flight in Flight.query.all()]
         data['hotel_data'] = [hotel.read() for hotel in Hotel.query.all()]
     return data
 
@@ -243,7 +243,7 @@ def save_data_to_json(data, directory='backup'):
 # Load data from JSON files
 def load_data_from_json(directory='backup'):
     data = {}
-    for table in ['users', 'sections', 'groups', 'channels', 'posts']:
+    for table in ['users', 'sections', 'groups', 'channels', 'posts', 'hotel_data']:
         with open(os.path.join(directory, f'{table}.json'), 'r') as f:
             data[table] = json.load(f)
     return data
@@ -255,7 +255,9 @@ def restore_data(data):
         _ = Section.restore(data['sections'])
         _ = Group.restore(data['groups'], users)
         _ = Channel.restore(data['channels'])
-        _ = Post.restore(data['posts'])
+        # _ = Post.restore(data['posts'])
+        _ = Hotel.restore(data['hotel_data'])
+
     print("Data restored to the new database.")
 
 # Define a command to backup data
