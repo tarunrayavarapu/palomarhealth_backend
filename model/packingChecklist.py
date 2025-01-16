@@ -33,6 +33,30 @@ class packingChecklist(db.Model):
             "user": self.user,
             "item": self.item,
         }
+        
+    def update(self, data):
+
+        self.user = data.get('user', self.user)
+        self.item = data.get('item', self.item)
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
+        
+    @staticmethod
+    def restore(data):
+        for packing_item in data:
+            _ = packing_item.pop('id', None)  # Remove 'id' from post_data
+            packing_checklist_item = packing_item.get("item", None)
+            item = packingChecklist.query.filter_by(item=packing_checklist_item).first()
+            if item:
+                item.update(packing_item)
+            else:
+                item = packingChecklist(**packing_item)
+                item.update(packing_item)
+                item.create()
+                
 
 def initPackingChecklist():
 
