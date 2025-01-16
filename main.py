@@ -33,6 +33,7 @@ from api.currency import currency_api
 from api.waypoints import waypoints_api
 from api.flight_api import flight_api
 from api.food_review import food_review_api
+from api.hotel import hotel_api
 
 from api.vote import vote_api
 
@@ -83,6 +84,7 @@ app.register_blueprint(currency_api)
 app.register_blueprint(waypoints_api)
 app.register_blueprint(flight_api)
 app.register_blueprint(food_review_api)
+app.register_blueprint(hotel_api)
 
 app.register_blueprint(kiruthic_api)
 app.register_blueprint(aadi_api)

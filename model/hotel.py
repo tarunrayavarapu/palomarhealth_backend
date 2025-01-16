@@ -39,7 +39,6 @@ class Hotel(db.Model):
 
         return {
             "id": self.id,
-            "user": self.user,
             "hotel": self.hotel,
             "location": self.location,
             "rating": self.rating
@@ -49,6 +48,17 @@ class Hotel(db.Model):
 
         try:
             db.session.delete(self)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
+        
+    def update(self, data):
+
+        self.hotel = data.get('hotel', self.hotel)
+        self.location = data.get('location', self.location)
+        self.rating = data.get('rating', self.rating)
+        try:
             db.session.commit()
         except Exception as e:
             db.session.rollback()
