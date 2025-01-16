@@ -7,7 +7,7 @@ from __init__ import app, db
 
 class Hotel(db.Model):
 
-    __tablename__ = 'my_hotels'
+    __tablename__ = 'hotels'
 
     id = db.Column(db.Integer, primary_key=True)
     location = db.Column(db.String(3), nullable=False)
@@ -63,7 +63,7 @@ def initHotel():
         test_data = [
             Hotel(hotel='Hilton', location='Paris', rating=5),
             Hotel(hotel='Holiday Inn', location='San Diego', rating=4),
-            Hotel(hotel='Motel 6', location='Chicago', rating=3),
+            Hotel(hotel='Motel 12345', location='Los Angeles', rating=3),
         ]
         
         for entry in test_data:
