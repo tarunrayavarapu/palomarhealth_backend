@@ -33,6 +33,7 @@ from api.currency import currency_api
 from api.waypoints import waypoints_api
 from api.flight_api import flight_api
 from api.food_review import food_review_api
+from api.food_review123 import food_review123_api
 
 from api.vote import vote_api
 
@@ -53,6 +54,7 @@ from model.waypoints import Waypoints, initWaypoints
 from model.flight_api_post import Flight, initFlights
 from model.hotel import Hotel, initHotel
 from model.packingChecklist import packingChecklist, initPackingChecklist
+from model.food_review123 import FoodReview123, initFoodReviews
 
 from api.travel.kiruthic import *
 from api.travel.aadi import *
@@ -84,6 +86,7 @@ app.register_blueprint(currency_api)
 app.register_blueprint(waypoints_api)
 app.register_blueprint(flight_api)
 app.register_blueprint(food_review_api)
+app.register_blueprint(food_review123_api)
 
 app.register_blueprint(kiruthic_api)
 app.register_blueprint(aadi_api)
@@ -205,6 +208,7 @@ def generate_data():
     initFlights()
     initHotel()
     initPackingChecklist()
+    initFoodReviews()
     
 # Backup the old database
 def backup_database(db_uri, backup_uri):
