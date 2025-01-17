@@ -33,6 +33,7 @@ from api.currency import currency_api
 from api.waypoints import waypoints_api
 from api.flight_api import flight_api
 from api.food_review import food_review_api
+from api.food_review123 import food_review123_api
 
 from api.vote import vote_api
 
@@ -54,6 +55,7 @@ from model.flight_api_post import Flight, initFlights
 from model.hotel import Hotel, initHotel
 from model.budgeting import Budgeting, initBudgeting
 from model.packingChecklist import packingChecklist, initPackingChecklist
+from model.food_review123 import FoodReview123, initFoodReviews
 
 from api.travel.kiruthic import *
 from api.travel.aadi import *
@@ -85,6 +87,7 @@ app.register_blueprint(currency_api)
 app.register_blueprint(waypoints_api)
 app.register_blueprint(flight_api)
 app.register_blueprint(food_review_api)
+app.register_blueprint(food_review123_api)
 
 app.register_blueprint(kiruthic_api)
 app.register_blueprint(aadi_api)
@@ -207,6 +210,7 @@ def generate_data():
     initHotel()
     initPackingChecklist()
     initBudgeting()
+    initFoodReviews()
     
 # Backup the old database
 def backup_database(db_uri, backup_uri):
@@ -248,7 +252,7 @@ def save_data_to_json(data, directory='backup'):
 # Load data from JSON files
 def load_data_from_json(directory='backup'):
     data = {}
-    for table in ['users', 'sections', 'groups', 'channels', 'posts', 'hotel_data', 'flights', 'packing_checklists', 'budget_reviews', 'budgeting_data']:
+    for table in ['users', 'sections', 'groups', 'channels', 'posts', 'hotel_data', 'flights','waypoints', 'packing_checklists', 'budget_reviews', 'budgeting_data']:
         with open(os.path.join(directory, f'{table}.json'), 'r') as f:
             data[table] = json.load(f)
     return data
@@ -264,6 +268,7 @@ def restore_data(data):
         _ = Hotel.restore(data['hotel_data'])
         _ = Budgeting.restore(data['budgeting_data'])
         _ = Flight.restore(data['flights'])
+        _ = Waypoints.restore(data['waypoints'])
         _ = packingChecklist.restore(data['packing_checklists'])
         _ = BudgetReview.restore(data['budget_reviews'])
 

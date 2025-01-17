@@ -5,7 +5,6 @@ from datetime import datetime
 from __init__ import app
 from api.jwt_authorize import token_required
 from model.waypoints import Waypoints
-from model.channel import Channel
 
 """
 This Blueprint object is used to define APIs for the Waypoint model.
@@ -49,13 +48,11 @@ class WaypointAPI:
                 return {'message': 'Waypoint title is required'}, 400
             if 'comment' not in data:
                 return {'message': 'Waypoint comment is required'}, 400
-            if 'channel_id' not in data:
-                return {'message': 'Channel ID is required'}, 400
             if 'content' not in data:
                 data['content'] = {}
 
             # Create a new waypoint object using the data from the request
-            waypoint = Waypoints(data['title'], data['comment'], current_user.id, data['channel_id'], data['content'])
+            waypoint = Waypoints(data['title'], data['comment'], current_user.id, data['content'])
             # Save the waypoint object using the Object Relational Mapper (ORM) method defined in the model
             waypoint.create()
             # Return response to the client in JSON format, converting Python dictionaries to JSON format
@@ -97,7 +94,6 @@ class WaypointAPI:
             # Update the waypoint
             waypoint._title = data['title']
             waypoint._content = data['content']
-            waypoint._channel_id = data['channel_id']
             # Save the waypoint
             waypoint.update()
             # Return response
@@ -121,33 +117,9 @@ class WaypointAPI:
             # Return response
             return jsonify({"message": "Waypoint deleted"})
 
-    class _FILTER(Resource):
-        @token_required()
-        def post(self):
-            """
-            Retrieve all waypoints by channel ID and user ID.
-            """
-            # Obtain and validate the request data sent by the RESTful client API
-            data = request.get_json()
-            if data is None:
-                return {'message': 'Channel and User data not found'}, 400
-            if 'channel_id' not in data:
-                return {'message': 'Channel ID not found'}, 400
-            
-            # Find all waypoints by channel ID and user ID
-            waypoints = Waypoints.query.filter_by(_channel_id=data['channel_id']).all()
-            # Prepare a JSON list of all the waypoints, using list comprehension
-            json_ready = [waypoint.read() for waypoint in waypoints]
-            # Return a JSON list, converting Python dictionaries to JSON format
-            return jsonify(json_ready)
-
     """
-    Map the _CRUD, _USER, _BULK_CRUD, and _FILTER classes to the API endpoints for /waypoint, /waypoint/user, /waypoints, and /waypoints/filter.
+    Map the _CRUD, _USER, _BULK_CRUD, and _FILTER classes to the API endpoints for /waypoints.
     - The API resource class inherits from flask_restful.Resource.
     - The _CRUD class defines the HTTP methods for the API.
-    - The _USER class defines the endpoints for retrieving waypoints by the current user.
-    - The _BULK_CRUD class defines the bulk operations for the API.
-    - The _FILTER class defines the endpoints for filtering waypoints by channel ID and user ID.
     """
     api.add_resource(_CRUD, '/waypoints')
-    api.add_resource(_FILTER, '/waypoints/filter')

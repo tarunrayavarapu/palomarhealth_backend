@@ -6,7 +6,7 @@ food_review_api = Blueprint('food_review_api', __name__, url_prefix='/api')
 api = Api(food_review_api)
 
 # In-memory storage for reviews
-reviews = ["hi"]
+reviews = []
 
 class FoodReviewAPI:
     class _ReviewList(Resource):
@@ -56,5 +56,5 @@ class FoodReviewAPI:
             return {"average_rating": round(average_rating, 2), "total_reviews": len(reviews)}
 
 # Add resource routes
-api.add_resource(FoodReviewAPI._ReviewList, "/reviews")
-api.add_resource(FoodReviewAPI._AverageRating, "/reviews/average")
+api.add_resource(FoodReviewAPI._ReviewList, "/foodreviews")
+api.add_resource(FoodReviewAPI._AverageRating, "/foodreviews/average")
