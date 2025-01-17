@@ -34,6 +34,7 @@ from api.waypoints import waypoints_api
 from api.flight_api import flight_api
 from api.food_review import food_review_api
 from api.food_review123 import food_review123_api
+from api.budgeting import budgeting_api
 
 from api.vote import vote_api
 
@@ -88,6 +89,7 @@ app.register_blueprint(waypoints_api)
 app.register_blueprint(flight_api)
 app.register_blueprint(food_review_api)
 app.register_blueprint(food_review123_api)
+app.register_blueprint(budgeting_api)
 
 app.register_blueprint(kiruthic_api)
 app.register_blueprint(aadi_api)

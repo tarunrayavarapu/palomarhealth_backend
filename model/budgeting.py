@@ -1,4 +1,3 @@
-# post.py
 import logging
 from sqlite3 import IntegrityError
 from sqlalchemy.exc import IntegrityError
@@ -10,10 +9,10 @@ class Budgeting(db.Model):
     __tablename__ = 'budgeting_data'
 
     id = db.Column(db.Integer, primary_key=True)
-    total_budget = db.Column(db.Float, nullable=False)  # Changed to total_budget (float)
-    percent_hotels = db.Column(db.Float, nullable=False)  # Changed to percent_hotels (float)
-    percent_transport = db.Column(db.Float, nullable=False)  # Changed to percent_transport (float)
-    overbudget = db.Column(db.Boolean, nullable=False)  # Changed to overbudget (boolean)
+    total_budget = db.Column(db.Float, nullable=False) 
+    percent_hotels = db.Column(db.Float, nullable=False)
+    percent_transport = db.Column(db.Float, nullable=False) 
+    overbudget = db.Column(db.Boolean, nullable=False) 
 
     def __init__(self, total_budget, percent_hotels, percent_transport, overbudget):
 
