@@ -38,6 +38,7 @@ from api.food_review123 import food_review123_api
 from api.budgeting import budgeting_api
 
 from api.vote import vote_api
+from api.rate import rate_api
 
 from api.travel import *
 
@@ -52,6 +53,7 @@ from model.post import Post, initPosts
 from model.budgetReview import BudgetReview, initBudgetReviews
 from model.nestPost import NestPost, initNestPosts # Justin added this, custom format for his website
 from model.vote import Vote, initVotes
+from model.rate import Rate, initRates
 from model.waypoints import Waypoints, initWaypoints
 from model.flight_api_post import Flight, initFlights
 from model.hotel import Hotel, initHotel
@@ -82,6 +84,7 @@ app.register_blueprint(budget_review_api)
 app.register_blueprint(nestPost_api)
 app.register_blueprint(nestImg_api)
 app.register_blueprint(vote_api)
+app.register_blueprint(rate_api)
 app.register_blueprint(car_api)
 app.register_blueprint(weather_api)
 app.register_blueprint(currency_api)
@@ -203,11 +206,12 @@ def generate_data():
     initUsers()
     initSections()
     initGroups()
-    # initChannels()
-    initBudgetReviews()
     initPosts()
     initNestPosts()
     initVotes()
+    initRates()
+    # initChannels()
+    initBudgetReviews()
     initWaypoints()
     initFlights()
     initHotel()
@@ -269,8 +273,8 @@ def restore_data(data):
         _ = Section.restore(data['sections'])
         _ = Group.restore(data['groups'], users)
         _ = Channel.restore(data['channels'])
-        # _ = Post.restore(data['posts'])
-        _ = Hotel.restore(data['hotels'])
+        _ = Post.restore(data['posts'])
+        _ = Rate.restore(data['rates'])
         _ = Hotel.restore(data['hotel_data'])
         _ = Budgeting.restore(data['budgeting_data'])
         _ = Flight.restore(data['flights'])
