@@ -5,7 +5,6 @@ from sqlalchemy import Text, JSON
 from sqlalchemy.exc import IntegrityError
 from __init__ import app, db
 from model.user import User
-from model.channel import Channel
 
 class Waypoints(db.Model):
     """
@@ -19,7 +18,6 @@ class Waypoints(db.Model):
         _comment (db.Column): A string representing the comment of the waypoints.
         _content (db.Column): A JSON blob representing the content of the waypoints.
         _user_id (db.Column): An integer representing the user who created the waypoints.
-        _channel_id (db.Column): An integer representing the channel to which the waypoints belongs.
     """
     __tablename__ = 'waypoints'
 
@@ -28,9 +26,8 @@ class Waypoints(db.Model):
     _comment = db.Column(db.String(255), nullable=False)
     _content = db.Column(JSON, nullable=False)
     _user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    _channel_id = db.Column(db.Integer, db.ForeignKey('channels.id'), nullable=False)
 
-    def __init__(self, title, comment, user_id=None, channel_id=None, content={}, user_name=None, channel_name=None):
+    def __init__(self, title, comment, user_id=None, content={}, user_name=None, channel_name=None):
         """
         Constructor, 1st step in object creation.
         
@@ -38,13 +35,11 @@ class Waypoints(db.Model):
             title (str): The title of the waypoints.
             comment (str): The comment of the waypoints.
             user_id (int): The user who created the waypoints.
-            channel_id (int): The channel to which the waypoints belongs.
             content (dict): The content of the waypoints.
         """
         self._title = title
         self._comment = comment
         self._user_id = user_id
-        self._channel_id = channel_id
         self._content = content
 
     def __repr__(self):
@@ -55,7 +50,7 @@ class Waypoints(db.Model):
         Returns:
             str: A text representation of how to create the object.
         """
-        return f"Waypoints(id={self.id}, title={self._title}, comment={self._comment}, content={self._content}, user_id={self._user_id}, channel_id={self._channel_id})"
+        return f"Waypoints(id={self.id}, title={self._title}, comment={self._comment}, content={self._content}, user_id={self._user_id})"
 
     def create(self):
         """
@@ -84,67 +79,28 @@ class Waypoints(db.Model):
             dict: A dictionary containing the waypoints data, including user and channel names.
         """
         user = User.query.get(self._user_id)
-        channel = Channel.query.get(self._channel_id)
         data = {
             "id": self.id,
             "title": self._title,
             "comment": self._comment,
             "content": self._content,
-            "user_name": user.name if user else None,
-            "channel_name": channel.name if channel else None
+            "user_id": user.id if user else None,
         }
         return data
     
 
-    def update(self):
-        """
-        Updates the waypoints object with new data.
-        
-        Args:
-            inputs (dict): A dictionary containing the new data for the waypoints.
-        
-        Returns:
-            Waypoints: The updated waypoints object, or None on error.
-        """
-        
-        inputs = Waypoints.query.get(self.id)
-        
-        title = inputs._title
-        content = inputs._content
-        channel_id = inputs._channel_id
-        user_name = User.query.get(inputs._user_id).name if inputs._user_id else None
-        channel_name = Channel.query.get(inputs._channel_id).name if inputs._channel_id else None
-
-        # If channel_name is provided, look up the corresponding channel_id
-        if channel_name:
-            channel = Channel.query.filter_by(_name=channel_name).first()
-            if channel:
-                channel_id = channel.id
-                
-        if user_name:
-            user = User.query.filter_by(_name=user_name).first()
-            if user:
-                user_id = user.id
-            else:
-                return None
-
-        # Update table with new data
-        if title:
-            self._title = title
-        if content:
-            self._content = content
-        if channel_id:
-            self._channel_id = channel_id
-        if user_id:
-            self._user_id = user_id
+    def update(self, data):
+        self._title = data.get('_title', self._title)
+        self._content = data.get('_content', self._content)
+        self._comment = data.get('_comment', self._comment)
+        self._user_id = data.get('_user_id', self._user_id)
 
         try:
             db.session.commit()
-        except IntegrityError:
+        except Exception as e:
             db.session.rollback()
-            logging.warning(f"IntegrityError: Could not update waypoints with title '{title}' due to missing channel_id.")
-            return None
-        return self
+            raise e
+       
     
     def delete(self):
         """
@@ -170,7 +126,7 @@ class Waypoints(db.Model):
             title = waypoints_data.get("title", None)
             waypoints = Waypoints.query.filter_by(_title=title).first()
             if waypoints:
-                waypoints.update( waypoints_data)
+                waypoints.update(waypoints_data)
             else:
                 waypoints = Waypoints(**waypoints_data)
                 waypoints.update(waypoints_data)
@@ -194,9 +150,9 @@ def initWaypoints():
         db.create_all()
         """Tester data for table"""
         waypoints = [
-            Waypoints(title='Broken Bone', comment='Hospital', content={'type': 'announcement'}, user_id=1, channel_id=1),
-            Waypoints(title='Bruise', comment='Pharmacy', content={'type': 'announcement'}, user_id=1, channel_id=1),
-            Waypoints(title='Sprained Ankle', comment='Recovery Center', content={'type': 'announcement'}, user_id=2, channel_id=1),
+            Waypoints(title='Broken Bone', comment='Hospital', content={'type': 'announcement'}, user_id=1),
+            Waypoints(title='Bruise', comment='Pharmacy', content={'type': 'announcement'}, user_id=1),
+            Waypoints(title='Sprained Ankle', comment='Recovery Center', content={'type': 'announcement'}, user_id=2),
         ]
         
         for waypoints in waypoints:

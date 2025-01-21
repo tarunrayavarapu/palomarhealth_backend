@@ -33,6 +33,8 @@ from api.currency import currency_api
 from api.waypoints import waypoints_api
 from api.flight_api import flight_api
 from api.food_review import food_review_api
+from api.food_review123 import food_review123_api
+from api.budgeting import budgeting_api
 
 from api.vote import vote_api
 
@@ -52,7 +54,9 @@ from model.vote import Vote, initVotes
 from model.waypoints import Waypoints, initWaypoints
 from model.flight_api_post import Flight, initFlights
 from model.hotel import Hotel, initHotel
+from model.budgeting import Budgeting, initBudgeting
 from model.packingChecklist import packingChecklist, initPackingChecklist
+from model.food_review123 import FoodReview123, initFoodReviews
 
 from api.travel.kiruthic import *
 from api.travel.aadi import *
@@ -84,6 +88,8 @@ app.register_blueprint(currency_api)
 app.register_blueprint(waypoints_api)
 app.register_blueprint(flight_api)
 app.register_blueprint(food_review_api)
+app.register_blueprint(food_review123_api)
+app.register_blueprint(budgeting_api)
 
 app.register_blueprint(kiruthic_api)
 app.register_blueprint(aadi_api)
@@ -205,6 +211,8 @@ def generate_data():
     initFlights()
     initHotel()
     initPackingChecklist()
+    initBudgeting()
+    initFoodReviews()
     
 # Backup the old database
 def backup_database(db_uri, backup_uri):
@@ -230,6 +238,8 @@ def extract_data():
         data['flights'] = [flight.read() for flight in Flight.query.all()]
         data['hotel_data'] = [hotel.read() for hotel in Hotel.query.all()]
         data['packing_checklists'] = [item.read() for item in packingChecklist.query.all()]
+        data['budget_reviews'] = [item.read() for item in BudgetReview.query.all()]
+        data['budgeting_data'] = [budget.read() for budget in Budgeting.query.all()]
     return data
 
 # Save extracted data to JSON files
@@ -244,7 +254,7 @@ def save_data_to_json(data, directory='backup'):
 # Load data from JSON files
 def load_data_from_json(directory='backup'):
     data = {}
-    for table in ['users', 'sections', 'groups', 'channels', 'posts', 'hotel_data', 'flights']:
+    for table in ['users', 'sections', 'groups', 'channels', 'posts', 'hotel_data', 'flights','waypoints', 'packing_checklists', 'budget_reviews', 'budgeting_data']:
         with open(os.path.join(directory, f'{table}.json'), 'r') as f:
             data[table] = json.load(f)
     return data
@@ -258,7 +268,12 @@ def restore_data(data):
         _ = Channel.restore(data['channels'])
         # _ = Post.restore(data['posts'])
         _ = Hotel.restore(data['hotel_data'])
+        _ = Budgeting.restore(data['budgeting_data'])
         _ = Flight.restore(data['flights'])
+        _ = Waypoints.restore(data['waypoints'])
+        _ = packingChecklist.restore(data['packing_checklists'])
+        _ = BudgetReview.restore(data['budget_reviews'])
+
 
     print("Data restored to the new database.")
 
