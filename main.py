@@ -55,8 +55,7 @@ from model.vote import Vote, initVotes
 from model.waypoints import Waypoints, initWaypoints
 from model.flight_api_post import Flight, initFlights
 from model.hotel import Hotel, initHotel
-from model.budgeting import Budgeting, initBudgeting
-from model.packingChecklist import packingChecklist, initPackingChecklist
+from model.weather import Weather, initPackingChecklist
 from model.food_review123 import FoodReview123, initFoodReviews
 
 from api.travel.kiruthic import *
@@ -241,7 +240,7 @@ def extract_data():
         data['hotels'] = [hotel.read() for hotel in Hotel.query.all()]
         data['flights'] = [flight.read() for flight in Flight.query.all()]
         data['hotel_data'] = [hotel.read() for hotel in Hotel.query.all()]
-        data['packing_checklists'] = [item.read() for item in packingChecklist.query.all()]
+        data['packing_checklists'] = [item.read() for item in Weather.query.all()]
         data['budget_reviews'] = [item.read() for item in BudgetReview.query.all()]
         data['budgeting_data'] = [budget.read() for budget in Budgeting.query.all()]
     return data
@@ -276,7 +275,7 @@ def restore_data(data):
         _ = Budgeting.restore(data['budgeting_data'])
         _ = Flight.restore(data['flights'])
         _ = Waypoints.restore(data['waypoints'])
-        _ = packingChecklist.restore(data['packing_checklists'])
+        _ = Weather.restore(data['packing_checklists'])
         _ = BudgetReview.restore(data['budget_reviews'])
 
     print("Data restored to the new database.")
