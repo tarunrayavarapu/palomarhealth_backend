@@ -6,7 +6,7 @@ class FoodReview123(db.Model):
 
     This model represents a food review with information about the food name, review text, and rating.
     """
-    __tablename__ = 'food_reviews1234'
+    __tablename__ = 'foods'
     __table_args__ = {'extend_existing': True}  # Allow redefining the table
 
 
@@ -80,27 +80,30 @@ class FoodReview123(db.Model):
             db.session.rollback()
             raise e
 
+    def update(self, data):
+
+        self.food = data.get('food', self.food)
+        self.review = data.get('review', self.review)
+        self.rating = data.get('rating', self.rating)
+
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
     @staticmethod
     def restore(data):
-        """
-        Restore food reviews from a list of dictionaries.
-
-        Args:
-            data (list): A list of dictionaries containing food review data.
-
-        Returns:
-            dict: A dictionary of restored food reviews keyed by food name.
-        """
-        restored_reviews = {}
-        for review_data in data:
-            food = review_data.get("food", None)
-            food_review = FoodReview123.query.filter_by(food=food).first()
-            if food_review:
-                food_review.update(review_data)
+        
+        for food_data in data:
+            _ = food_data.pop('id', None)  # Remove 'id' from post_data
+            food_name = food_data.get("foods", None)
+            food = FoodReview123.query.filter_by(food=food_name).first()
+            if food:
+                food.update(food_data)
             else:
-                food_review = FoodReview123(**review_data)
-                food_review.create()
-        return restored_reviews
+                food = FoodReview123(**food_data)
+                food.update(food_data)
+                food.create()
 
 def initFoodReviews():
     """
