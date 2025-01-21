@@ -44,6 +44,7 @@ from api.travel import *
 
 
 # database Initialization functions
+from model.budgeting import Budgeting, initBudgeting
 from model.carChat import CarChat
 from model.user import User, initUsers
 from model.section import Section, initSections
@@ -209,8 +210,8 @@ def generate_data():
     initPosts()
     initNestPosts()
     initVotes()
-    initRates()
     # initChannels()
+    initRates()
     initBudgetReviews()
     initWaypoints()
     initFlights()
@@ -239,18 +240,15 @@ def extract_data():
         data['groups'] = [group.read() for group in Group.query.all()]
         data['channels'] = [channel.read() for channel in Channel.query.all()]
         data['posts'] = [post.read() for post in Post.query.all()]
+        data['rates'] = [rate.read() for rate in Rate.query.all()]
         data['waypoints'] = [waypoints.read() for waypoints in Waypoints.query.all()]
-        data['flight'] = [flight_api.read() for flight in Flight.query.all()]
         data['hotels'] = [hotel.read() for hotel in Hotel.query.all()]
         data['flights'] = [flight.read() for flight in Flight.query.all()]
         data['hotel_data'] = [hotel.read() for hotel in Hotel.query.all()]
         data['packing_checklists'] = [item.read() for item in Weather.query.all()]
         data['budget_reviews'] = [item.read() for item in BudgetReview.query.all()]
-<<<<<<< HEAD
         data['budgeting_data'] = [budget.read() for budget in Budgeting.query.all()]
-=======
         data['foods'] = [food.read() for food in FoodReview123.query.all()]
->>>>>>> 62c3833 (food review 123py)
     return data
 
 # Save extracted data to JSON files
@@ -265,11 +263,7 @@ def save_data_to_json(data, directory='backup'):
 # Load data from JSON files
 def load_data_from_json(directory='backup'):
     data = {}
-<<<<<<< HEAD
-    for table in ['users', 'sections', 'groups', 'channels', 'posts', 'hotel_data', 'flights','waypoints', 'packing_checklists', 'budget_reviews', 'budgeting_data']:
-=======
-    for table in ['users', 'sections', 'groups', 'channels', 'posts', 'hotel_data', 'flights','waypoints', 'packing_checklists', 'budget_reviews', 'foods']:
->>>>>>> 62c3833 (food review 123py)
+    for table in ['users', 'sections', 'groups', 'channels', 'posts', 'hotel_data', 'flights', 'waypoints', 'packing_checklists', 'budget_reviews', 'budgeting_data', 'foods', 'rates']:
         with open(os.path.join(directory, f'{table}.json'), 'r') as f:
             data[table] = json.load(f)
     return data
