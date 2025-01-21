@@ -7,7 +7,7 @@ from __init__ import app, db
 
 class Hotel(db.Model):
 
-    __tablename__ = 'hotel_data'
+    __tablename__ = 'hotels'
 
     id = db.Column(db.Integer, primary_key=True)
     hotel = db.Column(db.String(3), nullable=False)
@@ -64,21 +64,6 @@ class Hotel(db.Model):
             db.session.rollback()
             raise e
 
-    # @staticmethod
-    # def restore(data):
-
-    #     restored_hotels = {}
-    #     for hotel_data in data:
-    #         _ = hotel_data.pop('id', None)
-    #         hotel = hotel_data.get("hotel", None)
-    #         hotel_class = Hotel.query.filter_by(hotel=hotel).first()
-    #         if hotel_class:
-    #             hotel_class.update(hotel_data)
-    #         else:
-    #             hotel_class = Hotel(**hotel_data)
-    #             hotel_class.create()
-    #         restored_hotels[hotel] = hotel_class
-    #     return restored_hotels
 
     @staticmethod
     def restore(data):
