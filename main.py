@@ -275,7 +275,7 @@ def restore_data(data):
         _ = Section.restore(data['sections'])
         _ = Group.restore(data['groups'], users)
         _ = Channel.restore(data['channels'])
-        _ = Post.restore(data['posts'])
+        # _ = Post.restore(data['posts'])
         _ = Rate.restore(data['rates'])
         _ = Hotel.restore(data['hotel_data'])
         _ = Budgeting.restore(data['budgeting_data'])
