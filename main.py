@@ -50,6 +50,7 @@ from model.budgetReview import BudgetReview, initBudgetReviews
 from model.nestPost import NestPost, initNestPosts # Justin added this, custom format for his website
 from model.vote import Vote, initVotes
 from model.waypoints import Waypoints, initWaypoints
+from model.waypointsuser import WaypointsUser, initWaypointsUser
 from model.flight_api_post import Flight, initFlights
 from model.hotel import Hotel, initHotel
 from model.packingChecklist import packingChecklist, initPackingChecklist
@@ -202,6 +203,7 @@ def generate_data():
     initNestPosts()
     initVotes()
     initWaypoints()
+    initWaypointsUser()
     initFlights()
     initHotel()
     initPackingChecklist()
@@ -227,6 +229,7 @@ def extract_data():
         data['channels'] = [channel.read() for channel in Channel.query.all()]
         data['posts'] = [post.read() for post in Post.query.all()]
         data['waypoints'] = [waypoints.read() for waypoints in Waypoints.query.all()]
+        data['waypointsuser'] = [waypointsuser.read() for waypointsuser in WaypointsUser.query.all()]
         data['flights'] = [flight.read() for flight in Flight.query.all()]
         data['hotel_data'] = [hotel.read() for hotel in Hotel.query.all()]
         data['packing_checklists'] = [item.read() for item in packingChecklist.query.all()]
@@ -262,6 +265,7 @@ def restore_data(data):
 
         _ = Flight.restore(data['flights'])
         _ = Waypoints.restore(data['waypoints'])
+        _ = WaypointsUser.restore(data['waypointsuser'])
         _ = packingChecklist.restore(data['packing_checklists'])
         _ = BudgetReview.restore(data['budget_reviews'])
 
