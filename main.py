@@ -33,13 +33,18 @@ from api.currency import currency_api
 from api.waypoints import waypoints_api
 from api.flight_api import flight_api
 from api.food_review import food_review_api
+from api.hotel import hotel_api
+from api.food_review123 import food_review123_api
+from api.budgeting import budgeting_api
 
 from api.vote import vote_api
+from api.rate import rate_api
 
 from api.travel import *
 
 
 # database Initialization functions
+from model.budgeting import Budgeting, initBudgeting
 from model.carChat import CarChat
 from model.user import User, initUsers
 from model.section import Section, initSections
@@ -49,11 +54,13 @@ from model.post import Post, initPosts
 from model.budgetReview import BudgetReview, initBudgetReviews
 from model.nestPost import NestPost, initNestPosts # Justin added this, custom format for his website
 from model.vote import Vote, initVotes
+from model.rate import Rate, initRates
 from model.waypoints import Waypoints, initWaypoints
 from model.waypointsuser import WaypointsUser, initWaypointsUser
 from model.flight_api_post import Flight, initFlights
 from model.hotel import Hotel, initHotel
-from model.packingChecklist import packingChecklist, initPackingChecklist
+from model.weather import Weather, initPackingChecklist
+from model.food_review123 import FoodReview123, initFoodReviews
 
 from api.travel.kiruthic import *
 from api.travel.aadi import *
@@ -79,12 +86,16 @@ app.register_blueprint(budget_review_api)
 app.register_blueprint(nestPost_api)
 app.register_blueprint(nestImg_api)
 app.register_blueprint(vote_api)
+app.register_blueprint(rate_api)
 app.register_blueprint(car_api)
 app.register_blueprint(weather_api)
 app.register_blueprint(currency_api)
 app.register_blueprint(waypoints_api)
 app.register_blueprint(flight_api)
 app.register_blueprint(food_review_api)
+app.register_blueprint(hotel_api)
+app.register_blueprint(food_review123_api)
+app.register_blueprint(budgeting_api)
 
 app.register_blueprint(kiruthic_api)
 app.register_blueprint(aadi_api)
@@ -197,16 +208,19 @@ def generate_data():
     initUsers()
     initSections()
     initGroups()
-    # initChannels()
-    initBudgetReviews()
     initPosts()
     initNestPosts()
     initVotes()
+    # initChannels()
+    initRates()
+    initBudgetReviews()
     initWaypoints()
     initWaypointsUser()
     initFlights()
     initHotel()
     initPackingChecklist()
+    initBudgeting()
+    initFoodReviews()
     
 # Backup the old database
 def backup_database(db_uri, backup_uri):
@@ -228,11 +242,13 @@ def extract_data():
         data['groups'] = [group.read() for group in Group.query.all()]
         data['channels'] = [channel.read() for channel in Channel.query.all()]
         data['posts'] = [post.read() for post in Post.query.all()]
+        data['rates'] = [rate.read() for rate in Rate.query.all()]
         data['waypoints'] = [waypoints.read() for waypoints in Waypoints.query.all()]
         data['waypointsuser'] = [waypointsuser.read() for waypointsuser in WaypointsUser.query.all()]
+        data['hotels'] = [hotel.read() for hotel in Hotel.query.all()]
         data['flights'] = [flight.read() for flight in Flight.query.all()]
         data['hotel_data'] = [hotel.read() for hotel in Hotel.query.all()]
-        data['packing_checklists'] = [item.read() for item in packingChecklist.query.all()]
+        data['packing_checklists'] = [item.read() for item in Weather.query.all()]
         data['budget_reviews'] = [item.read() for item in BudgetReview.query.all()]
     return data
 
@@ -261,12 +277,13 @@ def restore_data(data):
         _ = Group.restore(data['groups'], users)
         _ = Channel.restore(data['channels'])
         # _ = Post.restore(data['posts'])
+        _ = Rate.restore(data['rates'])
         _ = Hotel.restore(data['hotel_data'])
-
+        _ = Budgeting.restore(data['budgeting_data'])
         _ = Flight.restore(data['flights'])
         _ = Waypoints.restore(data['waypoints'])
         _ = WaypointsUser.restore(data['waypointsuser'])
-        _ = packingChecklist.restore(data['packing_checklists'])
+        _ = Weather.restore(data['packing_checklists'])
         _ = BudgetReview.restore(data['budget_reviews'])
 
 

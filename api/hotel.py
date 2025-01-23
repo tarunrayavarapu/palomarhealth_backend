@@ -1,10 +1,11 @@
 from flask import Blueprint, request, jsonify
 from flask_restful import Api, Resource
+from flask_cors import CORS
 from __init__ import db
 from model.hotel import Hotel
 
 hotel_api = Blueprint('hotel_api', __name__, url_prefix='/api')
-
+CORS(hotel_api)
 api = Api(hotel_api)
 
 class HotelAPI:
@@ -14,12 +15,13 @@ class HotelAPI:
 
             data = request.get_json()
 
-            if not data or 'hotel' not in data or 'location' not in data or 'rating' not in data:
+            if not data or 'hotel' not in data or 'city' not in data or 'country' not in data or 'rating' not in data:
                 return {'message': 'Hotel, location, and rating are required'}, 400
 
             hotel = Hotel(
                 hotel=data.get('hotel'),
-                location=data.get('location'),
+                city=data.get('city'),
+                country=data.get('country'),
                 rating=data.get('rating')
             )
 

@@ -7,22 +7,24 @@ from __init__ import app, db
 
 class Hotel(db.Model):
 
-    __tablename__ = 'hotel_data'
+    __tablename__ = 'hotels'
 
     id = db.Column(db.Integer, primary_key=True)
     hotel = db.Column(db.String(3), nullable=False)
-    location = db.Column(db.String(3), nullable=False)
+    city = db.Column(db.String(3), nullable=False)
+    country = db.Column(db.String(3), nullable=False)
     rating = db.Column(db.String(3), nullable=False)
 
-    def __init__(self, hotel, location, rating):
+    def __init__(self, hotel, city, country, rating):
 
         self.hotel = hotel
-        self.location = location
+        self.city = city
+        self.country = country
         self.rating = rating
 
     def __repr__(self):
 
-        return f"Hotel(id={self.id}, hotel={self.hotel}, location={self.location}, rating={self.rating})"
+        return f"Hotel(id={self.id}, hotel={self.hotel}, city={self.city}, country={self.country}, rating={self.rating})"
 
     def create(self):
 
@@ -31,7 +33,7 @@ class Hotel(db.Model):
             db.session.commit()
         except IntegrityError as e:
             db.session.rollback()
-            logging.warning(f"IntegrityError: Could not save '{self.hotel}', '{self.location}', and '{self.rating}' due to {str(e)}.")
+            logging.warning(f"IntegrityError: Could not save '{self.hotel}', '{self.city}', '{self.country}', and '{self.rating}' due to {str(e)}.")
             return None
         return self
         
@@ -40,7 +42,8 @@ class Hotel(db.Model):
         return {
             "id": self.id,
             "hotel": self.hotel,
-            "location": self.location,
+            "city": self.city,
+            "country": self.country,
             "rating": self.rating
         }
     
@@ -56,13 +59,15 @@ class Hotel(db.Model):
     def update(self, data):
 
         self.hotel = data.get('hotel', self.hotel)
-        self.location = data.get('location', self.location)
+        self.city = data.get('city', self.city)
+        self.country = data.get('country', self.country)
         self.rating = data.get('rating', self.rating)
         try:
             db.session.commit()
         except Exception as e:
             db.session.rollback()
             raise e
+
 
     @staticmethod
     def restore(data):
@@ -84,9 +89,9 @@ def initHotel():
         db.create_all()
 
         test_data = [
-            Hotel(hotel='Hilton', location='Paris', rating=5),
-            Hotel(hotel='Holiday Inn', location='San Diego', rating=4),
-            Hotel(hotel='Motel 12345', location='Los Angeles', rating=3),
+            Hotel(hotel='Hilton', city='Paris', country='France', rating=5),
+            Hotel(hotel='Holiday Inn', city='San Diego', country='USA', rating=4),
+            Hotel(hotel='Motel 12345', city='Los Angeles', country='USA', rating=3),
         ]
         
         for entry in test_data:
@@ -95,4 +100,4 @@ def initHotel():
                 print(f"Record created: {repr(entry)}")
             except IntegrityError:
                 db.session.remove()
-                print(f"Record exists or error: {entry.hotel}, {entry.location} and {entry.rating}")
+                print(f"Record exists or error: {entry.hotel}, {entry.city}, {entry.country} and {entry.rating}")
