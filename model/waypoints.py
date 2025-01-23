@@ -14,33 +14,36 @@ class Waypoints(db.Model):
     
     Attributes:
         id (db.Column): The primary key, an integer representing the unique identifier for the waypoints.
-        _title (db.Column): A string representing the title of the waypoints.
-        _comment (db.Column): A string representing the comment of the waypoints.
-        _content (db.Column): A JSON blob representing the content of the waypoints.
-        _user_id (db.Column): An integer representing the user who created the waypoints.
+        _injury (db.Column): A string representing the injury of the waypoints.
+        _location (db.Column): A string representing the location of the waypoints.
     """
     __tablename__ = 'waypoints'
 
     id = db.Column(db.Integer, primary_key=True)
-    _title = db.Column(db.String(255), nullable=False)
-    _comment = db.Column(db.String(255), nullable=False)
-    _content = db.Column(JSON, nullable=False)
-    _user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    _injury = db.Column(db.String(255), nullable=False)
+    _location = db.Column(db.String(255), nullable=False)
+    _notes = db.Column(JSON, nullable=False)
 
-    def __init__(self, title, comment, user_id=None, content={}, user_name=None, channel_name=None):
+    def __init__(self, injury, location, notes={}):
         """
         Constructor, 1st step in object creation.
         
         Args:
-            title (str): The title of the waypoints.
-            comment (str): The comment of the waypoints.
-            user_id (int): The user who created the waypoints.
-            content (dict): The content of the waypoints.
+            injury (str): The injury of the waypoints.
+            location (str): The location of the waypoints.
+            notes (json): The extra notes of the waypoints.
         """
-        self._title = title
-        self._comment = comment
-        self._user_id = user_id
-        self._content = content
+        self._injury = injury
+        self._location = location
+        self._notes = notes
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "injury": self._injury,
+            "location": self._location,
+            "notes": self._notes,
+        }
 
     def __repr__(self):
         """
@@ -50,7 +53,7 @@ class Waypoints(db.Model):
         Returns:
             str: A text representation of how to create the object.
         """
-        return f"Waypoints(id={self.id}, title={self._title}, comment={self._comment}, content={self._content}, user_id={self._user_id})"
+        return f"Waypoints(id={self.id}, injury={self._injury}, location={self._location}, notes={self._notes}"
 
     def create(self):
         """
@@ -64,7 +67,7 @@ class Waypoints(db.Model):
             db.session.commit()
         except IntegrityError as e:
             db.session.rollback()
-            logging.warning(f"IntegrityError: Could not create waypoints with title '{self._title}' due to {str(e)}.")
+            logging.warning(f"IntegrityError: Could not create waypoints with injury '{self._injury}' due to {str(e)}.")
             return None
         return self
         
@@ -78,22 +81,19 @@ class Waypoints(db.Model):
         Returns:
             dict: A dictionary containing the waypoints data, including user and channel names.
         """
-        user = User.query.get(self._user_id)
         data = {
             "id": self.id,
-            "title": self._title,
-            "comment": self._comment,
-            "content": self._content,
-            "user_id": user.id if user else None,
+            "injury": self._injury,
+            "location": self._location,
+            "notes": self._notes,
         }
         return data
     
 
     def update(self, data):
-        self._title = data.get('_title', self._title)
-        self._content = data.get('_content', self._content)
-        self._comment = data.get('_comment', self._comment)
-        self._user_id = data.get('_user_id', self._user_id)
+        self._injury = data.get('_injury', self._injury)
+        self._notes = data.get('_notes', self._notes)
+        self._location = data.get('_location', self._location)
 
         try:
             db.session.commit()
@@ -123,8 +123,8 @@ class Waypoints(db.Model):
     def restore(data):
         for waypoints_data in data:
             _ = waypoints_data.pop('id', None)  # Remove 'id' from waypoints_data
-            title = waypoints_data.get("title", None)
-            waypoints = Waypoints.query.filter_by(_title=title).first()
+            injury = waypoints_data.get("injury", None)
+            waypoints = Waypoints.query.filter_by(_injury=injury).first()
             if waypoints:
                 waypoints.update(waypoints_data)
             else:
@@ -150,9 +150,50 @@ def initWaypoints():
         db.create_all()
         """Tester data for table"""
         waypoints = [
-            Waypoints(title='Broken Bone', comment='Hospital', content={'type': 'announcement'}, user_id=1),
-            Waypoints(title='Bruise', comment='Pharmacy', content={'type': 'announcement'}, user_id=1),
-            Waypoints(title='Sprained Ankle', comment='Recovery Center', content={'type': 'announcement'}, user_id=2),
+                    Waypoints(injury='Fractures', location='Hospital', notes={}),
+                    Waypoints(injury='Broken Bones', location='Hospital', notes={}),
+                    Waypoints(injury='Severe Bleeding', location='Hospital', notes={}),
+                    Waypoints(injury='Head Injuries', location='Hospital', notes={}),
+                    Waypoints(injury='Concussions', location='Hospital', notes={}),
+                    Waypoints(injury='Heart Attack', location='Hospital', notes={}),
+                    Waypoints(injury='Stroke', location='Hospital', notes={}),
+                    Waypoints(injury='Appendicitis', location='Hospital', notes={}),
+                    Waypoints(injury='Dehydration', location='Hospital', notes={}),
+                    Waypoints(injury='Heatstroke', location='Hospital', notes={}),
+                    Waypoints(injury='Allergic Reaction', location='Hospital', notes={}),
+                    Waypoints(injury='Burns', location='Hospital', notes={}),
+                    Waypoints(injury='Respiratory Issues', location='Hospital', notes={}),
+                    Waypoints(injury='Infections', location='Hospital', notes={}),
+                    Waypoints(injury='Snake Bite', location='Hospital', notes={}),
+                    Waypoints(injury='Animal Bite', location='Hospital', notes={}),
+                    Waypoints(injury='Minor Cuts', location='Pharmacy', notes={}),
+                    Waypoints(injury='Motion Sickness', location='Pharmacy', notes={}),
+                    Waypoints(injury='Mild Allergies', location='Pharmacy', notes={}),
+                    Waypoints(injury='Upset Stomach', location='Pharmacy', notes={}),
+                    Waypoints(injury='Diarrhea', location='Pharmacy', notes={}),
+                    Waypoints(injury='Pain', location='Pharmacy', notes={}),
+                    Waypoints(injury='Headaches', location='Pharmacy', notes={}),
+                    Waypoints(injury='Coughs', location='Pharmacy', notes={}),
+                    Waypoints(injury='Colds', location='Pharmacy', notes={}),
+                    Waypoints(injury='Insect Bites', location='Pharmacy', notes={}),
+                    Waypoints(injury='Stings', location='Pharmacy', notes={}),
+                    Waypoints(injury='Sunburn', location='Pharmacy', notes={}),
+                    Waypoints(injury='Blisters', location='Pharmacy', notes={}),
+                    Waypoints(injury='Skin Irritation', location='Pharmacy', notes={}),
+                    Waypoints(injury='Menstrual Pain', location='Pharmacy', notes={}),
+                    Waypoints(injury='Muscle Strains', location='Recovery', notes={}),
+                    Waypoints(injury='Sprains', location='Recovery', notes={}),
+                    Waypoints(injury='Back Pain', location='Recovery', notes={}),
+                    Waypoints(injury='Neck Pain', location='Recovery', notes={}),
+                    Waypoints(injury='Post-Surgery Recovery', location='Recovery', notes={}),
+                    Waypoints(injury='Joint Injuries', location='Recovery', notes={}),
+                    Waypoints(injury='Exhaustion', location='Recovery', notes={}),
+                    Waypoints(injury='Chronic Fatigue', location='Recovery', notes={}),
+                    Waypoints(injury='Mental Health', location='Recovery', notes={}),
+                    Waypoints(injury='Substance Overuse', location='Recovery', notes={}),
+                    Waypoints(injury='Addiction', location='Recovery', notes={}),
+                    Waypoints(injury='Rehabilitation', location='Recovery', notes={}),
+                    Waypoints(injury='Mobility Issues', location='Recovery', notes={}),
         ]
         
         for waypoints in waypoints:
@@ -162,4 +203,4 @@ def initWaypoints():
             except IntegrityError:
                 '''fails with bad or duplicate data'''
                 db.session.remove()
-                print(f"Records exist, duplicate email, or error: {waypoints._title}")
+                print(f"Records exist, duplicate email, or error: {waypoints._injury}")
