@@ -41,6 +41,14 @@ class WaypointsUser(db.Model):
         self._address = address
         self._user_id = user_id
 
+    def to_dict(self):
+        return {
+            "injury": self._injury,
+            "location": self._location,
+            "address": self._address,
+            "user_id": self._user_id
+        }
+
     def __repr__(self):
         """
         The __repr__ method is a special method used to represent the object in a string format.

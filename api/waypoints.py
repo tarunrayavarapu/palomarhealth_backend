@@ -88,17 +88,15 @@ class WaypointAPI:
             Retrieve a single waypoint by ID.
             """
             # Obtain and validate the request data sent by the RESTful client API
-            data = request.get_json()
-            if data is None:
-                return {'message': 'Waypoint data not found'}, 400
-            if 'id' not in data:
-                return {'message': 'Waypoint ID not found'}, 400
-            # Find the waypoint to read
-            waypointsuser = WaypointsUser.query.get(data['id'])
+            current_user = g.current_user
+            waypointsuser = WaypointsUser.query.filter_by(_user_id=current_user.id)
             if waypointsuser is None:
                 return {'message': 'Waypoint not found'}, 404
             # Convert Python object to JSON format 
-            json_ready = waypointsuser.read()
+            waypointsusers = waypointsuser.all()
+            json_waypointsuser = [waypointsuser.to_dict() for waypointsuser in waypointsusers]
+            return jsonify(json_waypointsuser)
+
             # Return a JSON restful response to the client
             return jsonify(json_ready)
 
