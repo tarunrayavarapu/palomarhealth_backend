@@ -127,12 +127,9 @@ class WaypointAPI:
             """
             Delete a waypoint.
             """
-            # Obtain the current user
-            current_user = g.current_user
-            # Obtain the request data
-            data = request.get_json()
+            waypoint_id = request.args.get('waypoint_id')
             # Find the current waypoint from the database table(s)
-            waypointsuser = WaypointsUser.query.get(data['id'])
+            waypointsuser = WaypointsUser.query.filter_by(id=waypoint_id).first()
             if waypointsuser is None:
                 return {'message': 'Waypoint not found'}, 404
             # Delete the waypoint using the ORM method defined in the model

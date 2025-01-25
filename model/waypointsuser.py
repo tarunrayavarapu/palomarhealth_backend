@@ -43,6 +43,7 @@ class WaypointsUser(db.Model):
 
     def to_dict(self):
         return {
+            "id": self.id,
             "injury": self._injury,
             "location": self._location,
             "address": self._address,
