@@ -21,13 +21,8 @@ class Rate(db.Model):
     value = db.Column(db.Integer, nullable=False)  # Rating value (1-10)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), nullable=False)
-    
 
     def __init__(self, value, user_id, post_id):
-        """
-        Constructor to initialize
-        e post that received the rating.
-        """
         self.value = value
         self.user_id = user_id
         self.post_id = post_id
@@ -103,9 +98,11 @@ def initRates():
 
         # Optionally, add some test data (replace with actual values as needed)
         rates = [
-            Rate(value=8, user_id=1, post_id=1),
-            Rate(value=7, user_id=2, post_id=2),
-            Rate(value=9, user_id=3, post_id=3),
+            Rate(value=5, user_id=1, post_id=1),
+            Rate(value=6, user_id=1, post_id=2),
+            Rate(value=7, user_id=1, post_id=3),
+            Rate(value=8, user_id=1, post_id=4),
+            Rate(value=9, user_id=1, post_id=5),
         ]
         
         for rate in rates:
