@@ -44,6 +44,15 @@ class Weather(db.Model):
             db.session.rollback()
             raise e
         
+    def delete(self):
+
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
+        
     @staticmethod
     def restore(data):
         for packing_item in data:

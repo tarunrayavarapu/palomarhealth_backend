@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_restful import Api, Resource
+from flask_cors import CORS
 import requests
 import json
 from model.weather import Weather
@@ -7,6 +8,7 @@ from model.weather import Weather
 
 # blueprint for the weather api
 weather_api = Blueprint('weather_api', __name__, url_prefix='/api')
+CORS(weather_api, supports_credentials=True)
 api = Api(weather_api)
 
 # api key and api url for the weather api
@@ -50,8 +52,10 @@ class WeatherAPI:
                 if not weather:
                     return {'message': 'Weather not found'}, 404
                 return jsonify(weather)
-            # else:
-            #     return jsonify({"error": "Failed to get weather data"}), 500
+            
+            all_items = Weather.query.all()
+            return jsonify([weather.read() for weather in all_items])
+            
         def post(self):
 
             data = request.get_json()
@@ -59,14 +63,14 @@ class WeatherAPI:
             if not data or 'item' not in data:
                 return {'message': 'Required information not entered'}, 400
 
-            packing_checklists = Weather(
+            weather = Weather(
                 user = data.get('user'),
                 item = data.get('item')
             )
 
             try:
-                packing_checklists.create()
-                return jsonify(packing_checklists.read())
+                weather.create()
+                return jsonify(weather.read())
             except Exception as e:
                 return {'message': f'Error saving information: {e}'}, 500
 
@@ -76,13 +80,13 @@ class WeatherAPI:
             if not data or 'id' not in data:
                 return {'message': 'ID is required for updating information'}, 400
 
-            packing_checklists = Weather.query.get(data['id'])
-            if not packing_checklists:
+            weather = Weather.query.get(data['id'])
+            if not weather:
                 return {'message': 'Information not found'}, 404
 
             try:
-                packing_checklists.update(data)
-                return jsonify(packing_checklists.read())
+                weather.update(data)
+                return jsonify(weather.read())
             except Exception as e:
                 return {'message': f'Error updating information: {e}'}, 500
 
@@ -93,12 +97,12 @@ class WeatherAPI:
             if not data or 'id' not in data:
                 return {'message': 'ID is required for deleting information'}, 400
 
-            packing_checklists = Weather.query.get(data['id'])
-            if not packing_checklists:
+            weather = Weather.query.get(data['id'])
+            if not weather:
                 return {'message': 'Information not found'}, 404
 
             try:
-                packing_checklists.delete()
+                weather.delete()
                 return {'message': 'Information deleted successfully'}, 200
             except Exception as e:
                 return {'message': f'Error deleting information: {e}'}, 500
