@@ -1,10 +1,15 @@
-from flask import Blueprint, request, jsonify
+import jwt
+from flask import Blueprint, request, jsonify, g
 from flask_restful import Api, Resource
-from __init__ import db
+from flask_cors import CORS
+from datetime import datetime
+from __init__ import app, db  # Ensure db is imported
+from api.jwt_authorize import token_required
+from model.post import Post
 from model.budgeting import Budgeting  # Assuming your Budgeting model is in the 'budgeting' module
 
 budgeting_api = Blueprint('budgeting_api', __name__, url_prefix='/api')
-
+CORS(budgeting_api, supports_credentials=True, methods=["GET", "POST", "PUT", "DELETE"])
 api = Api(budgeting_api)
 
 class BudgetingAPI:
