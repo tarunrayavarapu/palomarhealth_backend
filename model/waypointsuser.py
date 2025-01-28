@@ -99,8 +99,8 @@ class WaypointsUser(db.Model):
 
     def update(self, data):
         self._injury = data.get('_injury', self._injury)
-        self._notes = data.get('_notes', self._notes)
         self._location = data.get('_location', self._location)
+        self._address = data.get('_address', self._address)
         self._user_id = data.get('_user_id', self._user_id)
 
         try:
