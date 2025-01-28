@@ -73,10 +73,12 @@ class WaypointAPI:
                 return {'message': 'Waypoint comment is required'}, 400
             if 'address' not in data:
                 data['address'] = {}
+            if 'rating' not in data:
+                data['rating'] = 5
 
             current_user = g.current_user
             # Create a new waypoint object using the data from the request
-            waypointsuser = WaypointsUser(data['injury'], data['location'], data['address'], current_user.id)
+            waypointsuser = WaypointsUser(data['injury'], data['location'], data['address'], data['rating'], current_user.id)
             # Save the waypoint object using the Object Relational Mapper (ORM) method defined in the model
             waypointsuser.create()
             # Return response to the client in JSON format, converting Python dictionaries to JSON format
@@ -110,13 +112,11 @@ class WaypointAPI:
             # Obtain the request data
             data = request.get_json()
             # Find the current waypoint from the database table(s)
-            waypointsuser = WaypointsUser.query.get(data['id'])
+            waypointsuser = WaypointsUser.query.get(data['waypoint_id'])
             if waypointsuser is None:
                 return {'message': 'WaypointUser not found'}, 404
             # Update the waypoint
-            waypointsuser._title = data['Injury']
-            waypointsuser._location = data['Location']
-            waypointsuser._address = data['Address']
+            waypointsuser._rating = data['rating']
             # Save the waypoint
             waypointsuser.update()
             # Return response

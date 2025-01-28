@@ -16,6 +16,7 @@ class WaypointsUser(db.Model):
         id (db.Column): The primary key, an integer representing the unique identifier for the waypointsuser.
         _injury (db.Column): A string representing the injury of the waypointsuser.
         _location (db.Column): A string representing the location of the waypointsuser.
+        _rating (db.Column): An integer representing the user rating on the hospital treatment.
         _user_id (db.Column): An integer representing the user who created the waypointsuser.
     """
     __tablename__ = 'waypointsuser'
@@ -24,9 +25,10 @@ class WaypointsUser(db.Model):
     _injury = db.Column(db.String(255), nullable=False)
     _location = db.Column(db.String(255), nullable=False)
     _address = db.Column(db.String(255), nullable=False)
+    _rating = db.Column(db.Integer, nullable=True)
     _user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
-    def __init__(self, injury, location, address, user_id=None):
+    def __init__(self, injury, location, address, rating, user_id=None):
         """
         Constructor, 1st step in object creation.
         
@@ -39,6 +41,7 @@ class WaypointsUser(db.Model):
         self._injury = injury
         self._location = location
         self._address = address
+        self._rating = rating
         self._user_id = user_id
 
     def to_dict(self):
@@ -47,7 +50,8 @@ class WaypointsUser(db.Model):
             "injury": self._injury,
             "location": self._location,
             "address": self._address,
-            "user_id": self._user_id
+            "rating": self._rating,
+            "user_id": self._user_id,
         }
 
     def __repr__(self):
@@ -58,7 +62,7 @@ class WaypointsUser(db.Model):
         Returns:
             str: A text representation of how to create the object.
         """
-        return f"WaypointsUser(id={self.id}, injury={self._injury}, location={self._location}, address={self._address}, user_id={self._user_id})"
+        return f"WaypointsUser(id={self.id}, injury={self._injury}, location={self._location}, address={self._address}, rating={self._rating}, user_id={self._user_id})"
 
     def create(self):
         """
@@ -92,17 +96,13 @@ class WaypointsUser(db.Model):
             "injury": self._injury,
             "location": self._location,
             "address": self._address,
+            "rating": self._rating,
             "user_id": user.id if user else None,
         }
         return data
     
 
-    def update(self, data):
-        self._injury = data.get('_injury', self._injury)
-        self._location = data.get('_location', self._location)
-        self._address = data.get('_address', self._address)
-        self._user_id = data.get('_user_id', self._user_id)
-
+    def update(self):
         try:
             db.session.commit()
         except Exception as e:
@@ -158,9 +158,9 @@ def initWaypointsUser():
         db.create_all()
         """Tester data for table"""
         waypointsuser = [
-                    WaypointsUser(injury='Fractures', location='Hospital', address="Scripps, La Jolla, CA", user_id=1),
-                    WaypointsUser(injury='Minor Cuts', location='Pharmacy', address="Scripps, La Jolla, CA", user_id=1),
-                    WaypointsUser(injury='Muscle Strains', location='Recovery', address="Scripps, La Jolla, CA", user_id=1),
+                    WaypointsUser(injury='Fractures', location='Hospital', address="Scripps, La Jolla, CA", rating=5, user_id=1),
+                    WaypointsUser(injury='Minor Cuts', location='Pharmacy', address="Scripps, La Jolla, CA", rating=5,user_id=1),
+                    WaypointsUser(injury='Muscle Strains', location='Recovery', address="Scripps, La Jolla, CA", rating=5, user_id=1),
         ]
         
         for waypointsuser in waypointsuser:
