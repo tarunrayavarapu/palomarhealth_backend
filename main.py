@@ -250,6 +250,7 @@ def extract_data():
         data['hotel_data'] = [hotel.read() for hotel in Hotel.query.all()]
         data['packing_checklists'] = [item.read() for item in Weather.query.all()]
         data['budget_reviews'] = [item.read() for item in BudgetReview.query.all()]
+        data['budgeting_data'] = [item.read() for item in Budgeting.query.all()]
     return data
 
 # Save extracted data to JSON files
@@ -264,7 +265,7 @@ def save_data_to_json(data, directory='backup'):
 # Load data from JSON files
 def load_data_from_json(directory='backup'):
     data = {}
-    for table in ['users', 'sections', 'groups', 'channels', 'posts', 'hotel_data', 'flights','waypoints', 'packing_checklists', 'budget_reviews']:
+    for table in ['users', 'sections', 'groups', 'channels', 'posts', 'hotel_data', 'flights','waypoints', 'waypointsuser', 'packing_checklists', 'budget_reviews', 'budgeting_data', 'rates']:
         with open(os.path.join(directory, f'{table}.json'), 'r') as f:
             data[table] = json.load(f)
     return data

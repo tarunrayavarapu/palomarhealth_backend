@@ -47,7 +47,7 @@ class Flight(db.Model):
        Returns:
            str: A string representation of the flight record.
        """
-       return f"Flight(id={self.id}, origin={self.origin}, destination={self.destination}, notes={self.note})"
+       return f"Flight(id={self.id}, origin={self.origin}, destination={self.destination}, note={self.note})"
 
 
    def create(self):
@@ -77,7 +77,7 @@ class Flight(db.Model):
            "id": self.id,
            "origin": self.origin,
            "destination": self.destination,
-           "notes": self.note,
+           "note": self.note,
        }
       
    def update(self, data):
