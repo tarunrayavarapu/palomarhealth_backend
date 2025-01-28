@@ -82,9 +82,9 @@ def initBudgeting():
         db.create_all()
 
         test_data = [
-            Budgeting(expense="Rent", cost=1000, category="Housing", user_id=1),
-            Budgeting(expense="Groceries", cost=300, category="Food", user_id=2),
-            Budgeting(expense="Transport", cost=150, category="Transport", user_id=1),
+            Budgeting(expense="Hilton Paris Opera", cost=1000, category="Hotels", user_id=1),
+            Budgeting(expense="Groceries", cost=50, category="Food", user_id=1),
+            Budgeting(expense="Paris Metro Pass", cost=80, category="Transport", user_id=1),
         ]
         
         for entry in test_data:
