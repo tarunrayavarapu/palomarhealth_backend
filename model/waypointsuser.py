@@ -102,14 +102,7 @@ class WaypointsUser(db.Model):
         return data
     
 
-    def update(self, data):
-        self._injury = data.get('_injury', self._injury)
-
-        self._location = data.get('_location', self._location)
-        self._address = data.get('_address', self._address)
-        self._rating = data.get('_rating', self._rating)
-        self._user_id = data.get('_user_id', self._user_id)
-
+    def update(self):
         try:
             db.session.commit()
         except Exception as e:
