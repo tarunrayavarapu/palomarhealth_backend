@@ -5,7 +5,7 @@ from __init__ import db
 from model.hotel import Hotel
 
 hotel_api = Blueprint('hotel_api', __name__, url_prefix='/api')
-CORS(hotel_api)
+CORS(hotel_api, supports_credentials=True)
 api = Api(hotel_api)
 
 class HotelAPI:
