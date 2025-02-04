@@ -215,4 +215,4 @@ def say_hello():
 
 if __name__ == '__main__':
     # starts flask server on default port, http://127.0.0.1:3003
-    app.run(port=8887)
+    app.run(port=8101)

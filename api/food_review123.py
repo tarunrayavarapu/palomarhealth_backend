@@ -5,9 +5,8 @@ from model.food_review123 import FoodReview123
 
 food_review123_api = Blueprint('food_review123_api', __name__, url_prefix='/api')
 
-api = Api(food_review123_api)
-from flask_cors import CORS
-CORS(food_review123_api, supports_credentials=True, methods=['GET', 'POST', 'PUT', 'DELETE'])
+api = Api(food_review123_api, supports_credentials=True)
+
 class FoodAPI:
     class _CRUD(Resource):
         def post(self):
