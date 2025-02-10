@@ -74,9 +74,9 @@ def initPackingChecklist():
         db.create_all()
 
         test_data = [
-            Weather(user='Aaditya Taleppady', item="Hat"),
-            Weather(user='Toby', item="Sunglasses"),
-            Weather(user='Mr. Mort', item="French Dictionary"),
+            Weather(user='toby', item="Hat"),
+            Weather(user='toby', item="Sunglasses"),
+            Weather(user='toby', item="French Dictionary"),
         ]
         
         for data in test_data:
