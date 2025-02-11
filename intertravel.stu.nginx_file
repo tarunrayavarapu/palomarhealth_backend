@@ -1,0 +1,37 @@
+server {
+    server_name intertravel.stu.nighthawkcodingsociety.com;
+    location / { 
+        proxy_pass http://localhost:8101;
+
+        # Preflighted requests 
+        if ($request_method = OPTIONS ) {
+                add_header "Access-Control-Allow-Credentials" "true" always;
+                add_header "Access-Control-Allow-Origin" "kiruthic-selvakumar.github.io" always;
+                add_header "Access-Control-Allow-Methods" "GET, POST, PUT, DELETE, OPTIONS, HEAD" always; # Make sure the request methods above match here
+                add_header "Access-Control-Allow-MaxAge" 600 always;
+                add_header "Access-Control-Allow-Headers" "Authorization, Origin, X-Requested-With, Content-Type, Accept" always;
+                return 204;
+        }
+    }
+
+    listen [::]:443 ssl; # managed by Certbot
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/intertravel.stu.nighthawkcodingsociety.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/intertravel.stu.nighthawkcodingsociety.com/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+server {
+    if ($host = intertravel.stu.nighthawkcodingsociety.com) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    listen 80;
+    listen [::]:80;
+    server_name intertravel.stu.nighthawkcodingsociety.com;
+    return 404; # managed by Certbot
+
+
+}
