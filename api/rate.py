@@ -8,6 +8,7 @@ from api.jwt_authorize import token_required
 from model.post import Post
 from model.rate import Rate
 from flask_cors import cross_origin  # Importing cross_origin
+from model.user import User
 
 
 # Define the Blueprint for the Rate API
@@ -51,7 +52,6 @@ class RateAPI:
 
             return jsonify({"message": "Rating submitted successfully"})
 
-
         @token_required()
         def get(self):
             """
@@ -60,9 +60,10 @@ class RateAPI:
             post_id = request.args.get('post_id')
             if not post_id:
                 return jsonify({"message": "post_id is required"}), 400
-            
-            ratings = Rate.query.filter_by(post_id=post_id).all()
-            ratings_list = [{"rating_id": r.id,"user_id": r.user_id, "rating": r.value} for r in ratings]
+
+            ratings = db.session.query(Rate, User).join(User, Rate.user_id == User.id).filter(Rate.post_id == post_id).all()
+            ratings_list = [{"rating_id": r.Rate.id, "username": r.User._name, "rating": r.Rate.value} for r in ratings]
+
             return jsonify(ratings_list)
 
         
