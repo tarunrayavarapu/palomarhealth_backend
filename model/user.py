@@ -506,7 +506,6 @@ def initUsers():
         """Tester data for table"""
         
         u1 = User(name='Thomas Edison', uid=app.config['ADMIN_USER'], password=app.config['ADMIN_PASSWORD'], pfp='toby.png', car='toby_car.png', role="Admin")
-        u2 = User(name='Grace Hopper', uid=app.config['DEFAULT_USER'], password=app.config['DEFAULT_PASSWORD'], pfp='hop.png')
         u3 = User(name='Nicholas Tesla', uid='niko', password='123niko', pfp='niko.png' )
         u4 = User(name='Arhaan Memon', uid='amemon', password=app.config['DEFAULT_PASSWORD'], pfp='toby.png', car='toby_car.png', role="Admin")
         u5 = User(name='David Brown', uid='david', password='123David!')
@@ -536,7 +535,7 @@ def initUsers():
         u29 = User(name='Matthew Robinson', uid='matthew', password='123Matthew!')
         u30 = User(name='Hannah Garcia', uid='hannah', password='123Hannah!')
 
-        users = [u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12, u13, u14, u15, u16, u17, u18, u19, u20, u21, u22, u23, u24, u25, u26, u27, u28, u29, u30]
+        users = [u1, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12, u13, u14, u15, u16, u17, u18, u19, u20, u21, u22, u23, u24, u25, u26, u27, u28, u29, u30]
 
         
         for user in users:
