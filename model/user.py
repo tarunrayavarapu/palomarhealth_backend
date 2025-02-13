@@ -509,7 +509,34 @@ def initUsers():
         u2 = User(name='Grace Hopper', uid=app.config['DEFAULT_USER'], password=app.config['DEFAULT_PASSWORD'], pfp='hop.png')
         u3 = User(name='Nicholas Tesla', uid='niko', password='123niko', pfp='niko.png' )
         u4 = User(name='Arhaan Memon', uid='amemon', password=app.config['DEFAULT_PASSWORD'], pfp='toby.png', car='toby_car.png', role="Admin")
-        users = [u1, u2, u3, u4]
+        u5 = User(name='David Brown', uid='david', password='123David')
+        u6 = User(name='Sarah Williams', uid='sarah', password='123Sarah')
+        u7 = User(name='James Wilson', uid='james', password='123James')
+        u8 = User(name='Olivia Taylor', uid='olivia', password='123Olivia')
+        u9 = User(name='Daniel Anderson', uid='daniel', password='123Daniel')
+        u10 = User(name='Sophia Thomas', uid='sophia', password='123Sophia')
+        u11 = User(name='Matthew Martinez', uid='matthew', password='123Matthew')
+        u12 = User(name='Charlotte Moore', uid='charlotte', password='123Charlotte')
+        u13 = User(name='William Jackson', uid='william', password='123William')
+        u14 = User(name='Ava Lee', uid='ava', password='123Ava')
+        u15 = User(name='Benjamin Harris', uid='benjamin', password='123Benjamin')
+        u16 = User(name='Isabella Clark', uid='isabella', password='123Isabella')
+        u17 = User(name='Lucas Lewis', uid='lucas', password='123Lucas')
+        u18 = User(name='Amelia Walker', uid='amelia', password='123Amelia')
+        u19 = User(name='Ethan Hall', uid='ethan', password='123Ethan')
+        u20 = User(name='Mia Young', uid='mia', password='123Mia')
+        u21 = User(name='Alexander King', uid='alexander', password='123Alexander')
+        u22 = User(name='Chloe Scott', uid='chloe', password='123Chloe')
+        u23 = User(name='Henry Adams', uid='henry', password='123Henry')
+        u24 = User(name='Ella Green', uid='ella', password='123Ella')
+        u25 = User(name='Jack Nelson', uid='jack', password='123Jack')
+        u26 = User(name='Lily Carter', uid='lily', password='123Lily')
+        u27 = User(name='Noah Mitchell', uid='noah', password='123Noah')
+        u28 = User(name='Grace Perez', uid='grace', password='123Grace')
+        u29 = User(name='Matthew Robinson', uid='matthew', password='123Matthew')
+        u30 = User(name='Hannah Garcia', uid='hannah', password='123Hannah')
+        users = [u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12, u13, u14, u15, u16, u17, u18, u19, u20, u21, u22, u23, u24, u25, u26, u27, u28, u29, u30]
+
         
         for user in users:
             try:

@@ -97,14 +97,39 @@ def initRates():
         db.create_all()
 
         # Optionally, add some test data (replace with actual values as needed)
-        rates = [
-            Rate(value=5, user_id=1, post_id=1),
-            Rate(value=6, user_id=1, post_id=2),
-            Rate(value=7, user_id=1, post_id=3),
-            Rate(value=8, user_id=1, post_id=4),
-            Rate(value=9, user_id=1, post_id=5),
-        ]
         
+        rates = [
+            Rate(value=5, user_id=5, post_id=1),
+            Rate(value=8, user_id=6, post_id=1),
+            Rate(value=1, user_id=7, post_id=1),
+            Rate(value=7, user_id=8, post_id=1),
+            Rate(value=1, user_id=9, post_id=1),
+
+            Rate(value=8, user_id=10, post_id=2),
+            Rate(value=6, user_id=11, post_id=2),
+            Rate(value=3, user_id=12, post_id=2),
+            Rate(value=8, user_id=13, post_id=2),
+            Rate(value=10, user_id=14, post_id=2),
+
+            Rate(value=8, user_id=15, post_id=3),
+            Rate(value=7, user_id=16, post_id=3),
+            Rate(value=6, user_id=17, post_id=3),
+            Rate(value=5, user_id=18, post_id=3),
+            Rate(value=5, user_id=19, post_id=3),
+
+            Rate(value=8, user_id=20, post_id=4),
+            Rate(value=4, user_id=21, post_id=4),
+            Rate(value=3, user_id=22, post_id=4),
+            Rate(value=8, user_id=23, post_id=4),
+            Rate(value=2, user_id=24, post_id=4),
+
+            Rate(value=2, user_id=25, post_id=5),
+            Rate(value=2, user_id=26, post_id=5),
+            Rate(value=1, user_id=27, post_id=5),
+            Rate(value=5, user_id=28, post_id=5),
+            Rate(value=7, user_id=29, post_id=5)
+        ]
+
         for rate in rates:
             try:
                 db.session.add(rate)
