@@ -69,11 +69,17 @@ class RateAPI:
         
         @token_required()
         def put(self):
+            """
+            Update a rating (1-10 scale) for a post.
+            """
+            # Get current user from the token
             current_user = g.current_user
+            # Get the request data
             data = request.get_json()
             rating_id = data.get('rating_id')
             new_rating_value = data.get('rating')
 
+            # Validate rating_id and new_rating_value
             if rating_id is None or new_rating_value is None:
                 return jsonify({"message": "rating_id and new rating value are required"}), 400
 
@@ -85,17 +91,21 @@ class RateAPI:
             if not (1 <= new_rating_value <= 10):
                 return jsonify({"message": "Rating must be between 1 and 10"}), 400
 
-            # Find the rating by ID and ensure it belongs to the current user
-            rating = Rate.query.filter_by(id=rating_id, user_id=current_user.id).first()
+            # Find the rating by ID and join with User to get the user's role
+            rating = db.session.query(Rate, User).join(User, Rate.user_id == User.id).filter(Rate.id == rating_id).first()
 
             if not rating:
-                return jsonify({"message": "Rating not found or not authorized"}), 404
+                return jsonify({"message": "Rating not found"}), 404
 
-            # Update the rating value
-            rating.value = new_rating_value
-            db.session.commit()
+            # Check if the current user is the owner of the rating or an admin
+            if rating.Rate.user_id == current_user.id or current_user.role == 'Admin':
+                # Update the rating value
+                rating.Rate.value = new_rating_value
+                db.session.commit()
 
-            return jsonify({"message": "Rating updated successfully"})
+                return jsonify({"message": "Rating updated successfully"})
+            else:
+                return jsonify({"message": "Not authorized to update this rating"}), 403
         
         @token_required()
         def delete(self):
@@ -108,15 +118,19 @@ class RateAPI:
 
             if rating_id is None:
                 return jsonify({"message": "rating_id is required"}), 400
-
-            rating = Rate.query.filter_by(user_id=current_user.id, id=rating_id).first()
-            if rating:
-                db.session.delete(rating)
-                db.session.commit()
-                return jsonify({"message": "Rating deleted successfully"})
-            else:
-                return jsonify({"message": "Rating not found"}), 404
-
+            
+            rating = db.session.query(Rate, User).join(User, Rate.user_id == User.id).filter(Rate.id == rating_id).first()
+            
+            if rating.Rate.user_id == current_user.id or current_user.role == 'Admin':
+                # Ensure the rating belongs to the current user
+                rating = Rate.query.filter_by(id=rating_id).first()
+                if rating:
+                    db.session.delete(rating)
+                    db.session.commit()
+                    return jsonify({"message": "Rating deleted successfully"})
+                else:
+                    return jsonify({"message": "Rating not found"}), 404
+           
 
 # Add resource to the API
 api.add_resource(RateAPI._CRUD, "/rate")
