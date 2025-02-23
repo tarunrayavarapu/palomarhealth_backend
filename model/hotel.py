@@ -10,13 +10,15 @@ class Hotel(db.Model):
     __tablename__ = 'hotels'
 
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     hotel = db.Column(db.String(3), nullable=False)
     city = db.Column(db.String(3), nullable=False)
     country = db.Column(db.String(3), nullable=False)
     rating = db.Column(db.String(3), nullable=False)
 
-    def __init__(self, hotel, city, country, rating):
+    def __init__(self, user_id, hotel, city, country, rating):
 
+        self.user_id = user_id
         self.hotel = hotel
         self.city = city
         self.country = country
@@ -24,7 +26,7 @@ class Hotel(db.Model):
 
     def __repr__(self):
 
-        return f"Hotel(id={self.id}, hotel={self.hotel}, city={self.city}, country={self.country}, rating={self.rating})"
+        return f"Hotel(id={self.id}, user_id={self.user_id}, hotel={self.hotel}, city={self.city}, country={self.country}, rating={self.rating})"
 
     def create(self):
 
@@ -33,7 +35,7 @@ class Hotel(db.Model):
             db.session.commit()
         except IntegrityError as e:
             db.session.rollback()
-            logging.warning(f"IntegrityError: Could not save '{self.hotel}', '{self.city}', '{self.country}', and '{self.rating}' due to {str(e)}.")
+            logging.warning(f"IntegrityError: Could not save '{self.user_id}', '{self.hotel}', '{self.city}', '{self.country}', and '{self.rating}' due to {str(e)}.")
             return None
         return self
         
@@ -41,6 +43,7 @@ class Hotel(db.Model):
 
         return {
             "id": self.id,
+            "user_id": self.user_id,
             "hotel": self.hotel,
             "city": self.city,
             "country": self.country,
@@ -58,6 +61,7 @@ class Hotel(db.Model):
         
     def update(self, data):
 
+        self.user_id = data.get('user_id', self.user_id)
         self.hotel = data.get('hotel', self.hotel)
         self.city = data.get('city', self.city)
         self.country = data.get('country', self.country)
@@ -89,9 +93,9 @@ def initHotel():
         db.create_all()
 
         test_data = [
-            Hotel(hotel='Hilton', city='Paris', country='France', rating=5),
-            Hotel(hotel='Holiday Inn', city='San Diego', country='USA', rating=4),
-            Hotel(hotel='Motel 12345', city='Los Angeles', country='USA', rating=3),
+            Hotel(user_id=1, hotel='Hilton', city='Paris', country='France', rating=5),
+            Hotel(user_id=1, hotel='Holiday Inn', city='San Diego', country='USA', rating=4),
+            Hotel(user_id=1, hotel='Motel 12345', city='Los Angeles', country='USA', rating=3),
         ]
         
         for entry in test_data:
