@@ -32,9 +32,12 @@ from api.weather import weather_api
 from api.currency import currency_api
 from api.waypoints import waypoints_api
 from api.flight_api import flight_api
-from api.food_review import food_review_api
+from api.food_review1 import food_review_1_api
 from api.hotel import hotel_api
 from api.food_review123 import food_review123_api
+from api.food_review12 import food_review_12_api
+from api.food_review1234 import food_review_1234_api
+from api.food_review12345 import food_review_12345_api
 from api.budgeting import budgeting_api
 
 from api.vote import vote_api
@@ -61,6 +64,10 @@ from model.flight_api_post import Flight, initFlights
 from model.hotel import Hotel, initHotel
 from model.weather import Weather, initPackingChecklist
 from model.food_review123 import FoodReview123, initFoodReviews
+from model.food_review1 import FoodReview1, initFoodReviews1
+from model.food_review12 import FoodReview12, initFoodReviews12
+from model.food_review1234 import FoodReview1234, initFoodReviews1234
+from model.food_review12345 import FoodReview12345, initFoodReviews12345
 
 from api.travel.kiruthic import *
 from api.travel.aadi import *
@@ -92,9 +99,12 @@ app.register_blueprint(weather_api)
 app.register_blueprint(currency_api)
 app.register_blueprint(waypoints_api)
 app.register_blueprint(flight_api)
-app.register_blueprint(food_review_api)
+app.register_blueprint(food_review_1_api)
 app.register_blueprint(hotel_api)
 app.register_blueprint(food_review123_api)
+app.register_blueprint(food_review_12_api)
+app.register_blueprint(food_review_1234_api)
+app.register_blueprint(food_review_12345_api)
 app.register_blueprint(budgeting_api)
 
 app.register_blueprint(kiruthic_api)
@@ -220,8 +230,11 @@ def generate_data():
     initHotel()
     initPackingChecklist()
     initBudgeting()
-    initFoodReviews()
-    
+    initFoodReviews1()
+    initFoodReviews12()
+    initFoodReviews1234()
+    initFoodReviews12345()
+
 # Backup the old database
 def backup_database(db_uri, backup_uri):
     """Backup the current database."""
