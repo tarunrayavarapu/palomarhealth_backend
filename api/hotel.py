@@ -30,7 +30,8 @@ class HotelAPI:
                 hotel=data.get('hotel'),
                 city=data.get('city'),
                 country=data.get('country'),
-                rating=data.get('rating')
+                rating=data.get('rating'),
+                note=data.get('note')
             )
 
             try:
@@ -54,7 +55,7 @@ class HotelAPI:
             # return jsonify([hotel.read() for hotel in all_hotels])
         
             hotels = db.session.query(Hotel, User).join(User, Hotel.user_id == User.id).all()
-            hotel_list = [{"id": h.Hotel.id, "user_id": h.User._name, "hotel": h.Hotel.hotel, "city": h.Hotel.city, "country": h.Hotel.country, "rating": h.Hotel.rating} for h in hotels]
+            hotel_list = [{"id": h.Hotel.id, "user_id": h.User._name, "hotel": h.Hotel.hotel, "city": h.Hotel.city, "country": h.Hotel.country, "rating": h.Hotel.rating, "note": h.Hotel.note} for h in hotels]
             
             return jsonify(hotel_list)
 

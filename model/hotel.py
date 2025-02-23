@@ -15,18 +15,20 @@ class Hotel(db.Model):
     city = db.Column(db.String(3), nullable=False)
     country = db.Column(db.String(3), nullable=False)
     rating = db.Column(db.String(3), nullable=False)
+    note = db.Column(db.String(3), nullable=False)
 
-    def __init__(self, user_id, hotel, city, country, rating):
+    def __init__(self, user_id, hotel, city, country, rating, note):
 
         self.user_id = user_id
         self.hotel = hotel
         self.city = city
         self.country = country
         self.rating = rating
+        self.note = note
 
     def __repr__(self):
 
-        return f"Hotel(id={self.id}, user_id={self.user_id}, hotel={self.hotel}, city={self.city}, country={self.country}, rating={self.rating})"
+        return f"Hotel(id={self.id}, user_id={self.user_id}, hotel={self.hotel}, city={self.city}, country={self.country}, rating={self.rating}, note={self.note})"
 
     def create(self):
 
@@ -35,7 +37,7 @@ class Hotel(db.Model):
             db.session.commit()
         except IntegrityError as e:
             db.session.rollback()
-            logging.warning(f"IntegrityError: Could not save '{self.user_id}', '{self.hotel}', '{self.city}', '{self.country}', and '{self.rating}' due to {str(e)}.")
+            logging.warning(f"IntegrityError: Could not save '{self.user_id}', '{self.hotel}', '{self.city}', '{self.country}', '{self.rating}', and '{self.note} due to {str(e)}.")
             return None
         return self
         
@@ -47,7 +49,8 @@ class Hotel(db.Model):
             "hotel": self.hotel,
             "city": self.city,
             "country": self.country,
-            "rating": self.rating
+            "rating": self.rating,
+            "note": self.note
         }
     
     def delete(self):
@@ -66,6 +69,7 @@ class Hotel(db.Model):
         self.city = data.get('city', self.city)
         self.country = data.get('country', self.country)
         self.rating = data.get('rating', self.rating)
+        self.note = data.get('note', self.note)
         try:
             db.session.commit()
         except Exception as e:
@@ -93,9 +97,9 @@ def initHotel():
         db.create_all()
 
         test_data = [
-            Hotel(user_id=1, hotel='Hilton', city='Paris', country='France', rating=5),
-            Hotel(user_id=1, hotel='Holiday Inn', city='San Diego', country='USA', rating=4),
-            Hotel(user_id=1, hotel='Motel 12345', city='Los Angeles', country='USA', rating=3),
+            Hotel(user_id=1, hotel='Hilton', city='Paris', country='France', rating=5, note="Beautiful hotel! Amazing pool and view!"),
+            Hotel(user_id=2, hotel='Holiday Inn', city='San Diego', country='USA', rating=2, note="Not the best hotel, but it was cheap."),
+            Hotel(user_id=3, hotel='Motel 12345', city='Los Angeles', country='USA', rating=1, note="Terrible hotel. Do not stay here!"),
         ]
         
         for entry in test_data:
