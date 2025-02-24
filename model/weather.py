@@ -82,9 +82,9 @@ def initPackingChecklist():
         db.create_all()
 
         test_data = [
-            Weather(user_id=1, item="Hat"),
-            Weather(user_id=1, item="Sunglasses"),
-            Weather(user_id=1, item="French Dictionary"),
+            Weather(item="Hat", user_id=1),
+            Weather(item="Sunglasses", user_id=1),
+            Weather(item="French Dictionary", user_id=1),
         ]
         
         for data in test_data:
