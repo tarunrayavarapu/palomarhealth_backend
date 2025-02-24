@@ -1,31 +1,35 @@
-from __init__ import db
+import logging
+from sqlite3 import IntegrityError
+from sqlalchemy.exc import IntegrityError
+from __init__ import app, db
 
 class FoodReview12345(db.Model):
-    """
-    FoodReview12345 Model
-
-    This model represents a food review with information about the food name, review text, and rating.
-    """
-    __tablename__ = 'food12345'
+    __tablename__ = 'food_reviews_12345'
     __table_args__ = {'extend_existing': True}  # Allow redefining the table
 
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Assuming you have a `User` model
     food = db.Column(db.String(255), nullable=False)
     review = db.Column(db.String(255), nullable=False)
     rating = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, food, review, rating):
+    def __init__(self, user_id, food, review, rating):
         """
-        Initialize the FoodReview1 object.
+        Initialize the FoodReview12345 object.
 
         Args:
+            user_id (int): The user ID who made the review.
             food (str): Name of the food item.
             review (str): Review text.
             rating (float): Rating (1 to 5).
         """
+        self.user_id = user_id
         self.food = food
         self.review = review
         self.rating = rating
+
+    def __repr__(self):
+        return f"FoodReview12345(id={self.id}, user_id={self.user_id}, food={self.food}, review={self.review}, rating={self.rating})"
 
     def create(self):
         """
@@ -36,6 +40,7 @@ class FoodReview12345(db.Model):
             db.session.commit()
         except Exception as e:
             db.session.rollback()
+            logging.warning(f"Error saving review for '{self.food}': {str(e)}")
             raise e
 
     def read(self):
@@ -47,6 +52,7 @@ class FoodReview12345(db.Model):
         """
         return {
             "id": self.id,
+            "user_id": self.user_id,
             "food": self.food,
             "review": self.review,
             "rating": self.rating
@@ -87,25 +93,24 @@ class FoodReview12345(db.Model):
         """
         for food_data in data:
             _ = food_data.pop('id', None)  # Remove 'id' from post_data
-            food_name = food_data.get("foods", None)
+            food_name = food_data.get("food", None)
             food = FoodReview12345.query.filter_by(food=food_name).first()
             if food:
                 food.update(food_data)
             else:
                 food = FoodReview12345(**food_data)
-                food.update(food_data)
                 food.create()
 
-def initFoodReviews12345 ():
+def initFoodReviews12345():
     """
-    Initialize the FoodReview1 table with default data.
+    Initialize the FoodReview12345 table with default data.
     """
     reviews = [
-        FoodReview12345("Pizza", "Delicious and cheesy!", "5"),
-        FoodReview12345("Burger", "Juicy and filling.", "4"),
-        FoodReview12345("Sushi", "Fresh and tasty.", "5"),
-        FoodReview12345("Pasta", "Creamy and delightful.", "4.5"),
-        FoodReview12345("Salad", "Healthy but could use more flavor.", "3")
+        FoodReview12345(user_id=1, food="Pizza", review="Delicious and cheesy!", rating="5"),
+        FoodReview12345(user_id=2, food="Burger", review="Juicy and filling.", rating="4"),
+        FoodReview12345(user_id=3, food="Sushi", review="Fresh and tasty.", rating="5"),
+        FoodReview12345(user_id=4, food="Pasta", review="Creamy and delightful.", rating="4.5"),
+        FoodReview12345(user_id=5, food="Salad", review="Healthy but could use more flavor.", rating="3")
     ]
 
     for review in reviews:
