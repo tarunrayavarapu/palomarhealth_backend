@@ -64,15 +64,26 @@ class Weather(db.Model):
     @staticmethod
     def restore(data):
         for packing_item in data:
-            _ = packing_item.pop('id', None)  # Remove 'id' from post_data
-            packing_checklist_item = packing_item.get("item", None)
-            item = Weather.query.filter_by(item=packing_checklist_item).first()
-            if item:
-                item.update(packing_item)
+            packing_id = packing_item.pop('id', None)  # Remove 'id' from post_data
+            if packing_id is not None:
+                item = Weather.query.get(packing_id)
+                if item:
+                    item.update(packing_item)
+                else:
+                    item = Weather(**packing_item)
+                    item.create()
             else:
                 item = Weather(**packing_item)
-                item.update(packing_item)
                 item.create()
+            
+            # packing_checklist_item = packing_item.get("item", None)
+            # item = Weather.query.filter_by(item=packing_checklist_item).first()
+            # if item:
+            #     item.update(packing_item)
+            # else:
+            #     item = Weather(**packing_item)
+            #     item.update(packing_item)
+            #     item.create()
                 
 
 def initPackingChecklist():
@@ -82,9 +93,9 @@ def initPackingChecklist():
         db.create_all()
 
         test_data = [
-            Weather(user_id=1, item="Hat"),
-            Weather(user_id=1, item="Sunglasses"),
-            Weather(user_id=1, item="French Dictionary"),
+            Weather(item="Hat", user_id=1),
+            Weather(item="Sunglasses", user_id=1),
+            Weather(item="French Dictionary", user_id=1),
         ]
         
         for data in test_data:
