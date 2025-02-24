@@ -1,21 +1,27 @@
 from sqlalchemy import Integer
 from __init__ import app, db
+import logging
+from sqlite3 import IntegrityError
+from sqlalchemy import Text, JSON
+from sqlalchemy.exc import IntegrityError
+from model.user import User
+from model.post import Post
 
 class Weather(db.Model):
     
     __tablename__ = 'packing_checklists'
     
     id = db.Column(db.Integer, primary_key=True)
-    user = db.Column(db.String(3), nullable=False)
     item = db.Column(db.String(3), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
-    def __init__(self, user, item):
-        self.user = user
+    def __init__(self, item, user_id=None, ):
         self.item = item
+        self.user_id = user_id
 
     def __repr__(self):
 
-        return f"Weather(id={self.id}, user={self.user}, item={self.item})"
+        return f"Weather(id={self.id}, user={self.user_id}, item={self.item})"
     
     def create(self):
 
@@ -25,19 +31,21 @@ class Weather(db.Model):
         except Exception as e:
             db.session.rollback()
             raise e
+        return self
 
     def read(self):
 
         return {
             "id": self.id,
-            "user": self.user,
             "item": self.item,
+            "user_id": self.user_id
+            
         }
         
     def update(self, data):
 
-        self.user = data.get('user', self.user)
         self.item = data.get('item', self.item)
+        self.user = data.get('user_id', self.user_id)
         try:
             db.session.commit()
         except Exception as e:
@@ -74,9 +82,9 @@ def initPackingChecklist():
         db.create_all()
 
         test_data = [
-            Weather(user='toby', item="Hat"),
-            Weather(user='toby', item="Sunglasses"),
-            Weather(user='toby', item="French Dictionary"),
+            Weather(user_id=1, item="Hat"),
+            Weather(user_id=1, item="Sunglasses"),
+            Weather(user_id=1, item="French Dictionary"),
         ]
         
         for data in test_data:
@@ -86,4 +94,4 @@ def initPackingChecklist():
                 print(f"Record created: {repr(data)}")
             except Exception as e:
                 db.session.rollback()
-                print(f"Error creating record for user {data.user}: {e}")
+                print(f"Error creating record for user {data.user_id}: {e}")

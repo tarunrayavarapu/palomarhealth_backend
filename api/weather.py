@@ -1,14 +1,22 @@
-from flask import Blueprint, request, jsonify
-from flask_restful import Api, Resource
-from flask_cors import CORS
+import jwt
 import requests
 import json
+import logging
+from flask import Blueprint, request, jsonify, g
+from flask_restful import Api, Resource
+from flask_cors import CORS
 from model.weather import Weather
+from datetime import datetime
+from __init__ import app, db 
+from api.jwt_authorize import token_required
+from model.post import Post
+from flask_cors import cross_origin 
+from model.user import User
 
 
 # blueprint for the weather api
 weather_api = Blueprint('weather_api', __name__, url_prefix='/api')
-CORS(weather_api, supports_credentials=True)
+CORS(weather_api, supports_credentials=True, methods=['GET', 'POST', 'PUT', 'DELETE'])
 api = Api(weather_api)
 
 # api key and api url for the weather api
@@ -39,12 +47,11 @@ class WeatherAPI:
 
 
     class _CRUD(Resource):
+        #@token_required()
+        @cross_origin(supports_credentials=True)
         def get(self):
             
-            # retrieve the weather data for the latitude and longitude of a city
-            
             weather_id = request.args.get('id')
-            # weather_data = get_weather_data(lat, lon)
 
             if weather_id:
                 weather = Weather.query.get(weather_id)
@@ -56,24 +63,29 @@ class WeatherAPI:
             all_items = Weather.query.all()
             return jsonify([weather.read() for weather in all_items])
             
+        @token_required()
+        @cross_origin(supports_credentials=True)
         def post(self):
 
+            current_user = g.current_user
             data = request.get_json()
+            item = data.get('item')
             
             if not data or 'item' not in data:
                 return {'message': 'Required information not entered'}, 400
 
+            current_user = g.current_user
+
             weather = Weather(
-                user = data.get('user'),
-                item = data.get('item')
+                item=data.get('item'), 
+                user_id=current_user.id
             )
+            
+            db.session.add(weather)
+            db.session.commit()
+            return jsonify(weather.read())
 
-            try:
-                weather.create()
-                return jsonify(weather.read())
-            except Exception as e:
-                return {'message': f'Error saving information: {e}'}, 500
-
+        #@token_required()
         def put(self):
             data = request.get_json()
 
@@ -90,6 +102,7 @@ class WeatherAPI:
             except Exception as e:
                 return {'message': f'Error updating information: {e}'}, 500
 
+        #@token_required()
         def delete(self):
 
             data = request.get_json()
