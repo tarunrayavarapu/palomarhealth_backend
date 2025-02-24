@@ -77,16 +77,21 @@ class Rate(db.Model):
         
     @staticmethod
     def restore(data):
+        """
+        Restore Rate data from a backup.
+        """
         for rate_data in data:
-            _ = rate_data.pop('id', None)  # Remove 'id' from post_data
-            title = rate_data.get("value", None)
-            post = Rate.query.filter_by(value=title).first()
-            if post:
-                post.update(rate_data)
+            rate_id = rate_data.pop('id', None)
+            if rate_id is not None:
+                rate = Rate.query.get(rate_id)
+                if rate:
+                    rate.update(rate_data)
+                else:
+                    rate = Rate(**rate_data)
+                    rate.create()
             else:
-                post = Rate(**rate_data)
-                post.update(rate_data)
-                post.create()
+                rate = Rate(**rate_data)
+                rate.create()
 
 def initRates():
     """
@@ -126,8 +131,7 @@ def initRates():
             Rate(value=2, user_id=25, post_id=5),
             Rate(value=2, user_id=26, post_id=5),
             Rate(value=1, user_id=27, post_id=5),
-            Rate(value=5, user_id=28, post_id=5),
-            Rate(value=7, user_id=29, post_id=5)
+            Rate(value=5, user_id=28, post_id=5)
         ]
 
         for rate in rates:
