@@ -102,14 +102,25 @@ class WaypointsUser(db.Model):
         return data
     
 
-    def update(self):
+    def update(self, data=None):
+        """
+        Updates the waypointsuser with new data.
+        
+        Args:
+            data (dict): Dictionary containing the fields to update
+        """
+        if data:
+            self._injury = data.get('injury', self._injury)
+            self._location = data.get('location', self._location)
+            self._address = data.get('address', self._address)
+            self._rating = data.get('rating', self._rating)
+            
         try:
             db.session.commit()
         except Exception as e:
             db.session.rollback()
             raise e
-       
-    
+
     def delete(self):
         """
         The delete method removes the object from the database and commits the transaction.
@@ -129,6 +140,12 @@ class WaypointsUser(db.Model):
         
     @staticmethod
     def restore(data):
+        """
+        Restores waypoints data from backup.
+        
+        Args:
+            data (list): List of waypoint dictionaries to restore
+        """
         for waypoints_data in data:
             _ = waypoints_data.pop('id', None)  # Remove 'id' from waypoints_data
             injury = waypoints_data.get("injury", None)
@@ -137,7 +154,6 @@ class WaypointsUser(db.Model):
                 waypointsuser.update(waypoints_data)
             else:
                 waypointsuser = WaypointsUser(**waypoints_data)
-                waypointsuser.update(waypoints_data)
                 waypointsuser.create()
         
 def initWaypointsUser():
