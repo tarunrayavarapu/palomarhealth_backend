@@ -306,3 +306,7 @@ app.cli.add_command(custom_cli)
 if __name__ == "__main__":
     # change name for testing
     app.run(debug=True, host="0.0.0.0", port="8101")
+
+@app.route('/budget_table')
+def budget_table():
+    return render_template('budget_table.html')  # Ensure you have this template

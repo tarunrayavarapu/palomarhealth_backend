@@ -1,0 +1,190 @@
+{% extends "layouts/base.html" %}
+
+{% block body %}
+<div class="container mt-5">
+  <h1>Budget Management</h1>
+  <button class="btn btn-success mb-3" id="addBudget">Add Budget Entry</button>
+  <table class="table table-striped" id="budgetTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Expense</th>
+        <th>Cost</th>
+        <th>Category</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="budgetBody">
+      <!-- Budgeting entries will be dynamically inserted here -->
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal for adding/editing a budgeting entry -->
+<div class="modal fade" id="budgetModal" tabindex="-1" role="dialog" aria-labelledby="budgetModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="budgetModalLabel">Budget Entry</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="budgetForm">
+          <input type="hidden" id="budgetId">
+          <div class="form-group">
+            <label for="budgetExpense">Expense</label>
+            <input type="text" class="form-control" id="budgetExpense">
+          </div>
+          <div class="form-group">
+            <label for="budgetCost">Cost</label>
+            <input type="number" class="form-control" id="budgetCost">
+          </div>
+          <div class="form-group">
+            <label for="budgetCategory">Category</label>
+            <input type="text" class="form-control" id="budgetCategory">
+          </div>
+          <button type="button" class="btn btn-primary" id="saveBudget">Save</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for delete confirmation -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Delete Budget Entry</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this budget entry?</p>
+        <input type="hidden" id="deleteBudgetId">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-danger" id="confirmDelete">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block background %}
+<script>
+  // Function to fetch and display all budgeting entries
+  async function fetchBudgetingEntries() {
+    try {
+      const response = await fetch('/api/budgeting');
+      if (!response.ok) throw new Error('Failed to fetch budgeting entries');
+      const budgetingEntries = await response.json();
+      const budgetBody = document.getElementById('budgetBody');
+      budgetBody.innerHTML = '';
+      budgetingEntries.forEach(entry => {
+        budgetBody.innerHTML += `
+          <tr data-id="${entry.id}" 
+              data-expense="${entry.expense}" 
+              data-cost="${entry.cost}" 
+              data-category="${entry.category}">
+            <td>${entry.id}</td>
+            <td>${entry.expense}</td>
+            <td>${entry.cost}</td>
+            <td>${entry.category}</td>
+            <td>
+              <button class="btn btn-primary edit-btn" data-id="${entry.id}">Edit</button>
+              <button class="btn btn-danger delete-btn" data-id="${entry.id}">Delete</button>
+            </td>
+          </tr>`;
+      });
+    } catch (error) {
+      console.error('Error fetching budgeting entries:', error);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    fetchBudgetingEntries();
+
+    // Handler for "Add Budget Entry" button
+    document.getElementById('addBudget').addEventListener('click', function() {
+      document.getElementById('budgetId').value = '';
+      document.getElementById('budgetExpense').value = '';
+      document.getElementById('budgetCost').value = '';
+      document.getElementById('budgetCategory').value = '';
+      $('#budgetModal').modal('show');
+    });
+
+    // Delegate click for edit buttons
+    document.getElementById('budgetBody').addEventListener('click', function(e) {
+      if (e.target && e.target.classList.contains('edit-btn')) {
+        const row = e.target.closest('tr');
+        document.getElementById('budgetId').value = row.getAttribute('data-id');
+        document.getElementById('budgetExpense').value = row.getAttribute('data-expense');
+        document.getElementById('budgetCost').value = row.getAttribute('data-cost');
+        document.getElementById('budgetCategory').value = row.getAttribute('data-category');
+        $('#budgetModal').modal('show');
+      }
+    });
+
+    // Delegate click for delete buttons
+    document.getElementById('budgetBody').addEventListener('click', function(e) {
+      if (e.target && e.target.classList.contains('delete-btn')) {
+        document.getElementById('deleteBudgetId').value = e.target.getAttribute('data-id');
+        $('#deleteModal').modal('show');
+      }
+    });
+
+    // Save budget entry (Create/Update)
+    document.getElementById('saveBudget').addEventListener('click', async function() {
+      const budgetId = document.getElementById('budgetId').value;
+      const expense = document.getElementById('budgetExpense').value;
+      const cost = document.getElementById('budgetCost').value;
+      const category = document.getElementById('budgetCategory').value;
+
+      let url = '/api/budgeting';
+      let method = budgetId ? 'PUT' : 'POST';
+      let payload = budgetId ? { id: budgetId, expense, cost, category } : { expense, cost, category };
+
+      try {
+        const response = await fetch(url, {
+          method: method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (response.ok) {
+          fetchBudgetingEntries();
+          $('#budgetModal').modal('hide');
+        } else {
+          alert('Failed to save budget entry.');
+        }
+      } catch (error) {
+        console.error('Error saving budget entry:', error);
+      }
+    });
+
+    // Delete budget entry
+    document.getElementById('confirmDelete').addEventListener('click', async function() {
+      const budgetId = document.getElementById('deleteBudgetId').value;
+      try {
+        const response = await fetch('/api/budgeting', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: budgetId })
+        });
+        if (response.ok) {
+          fetchBudgetingEntries();
+          $('#deleteModal').modal('hide');
+        } else {
+          alert('Failed to delete budget entry.');
+        }
+      } catch (error) {
+        console.error('Error deleting budget entry:', error);
+      }
+    });
+  });
+</script>
+{% endblock %}
