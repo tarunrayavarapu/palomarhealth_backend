@@ -137,5 +137,25 @@ class WaypointAPI:
             # Return response
             return jsonify({"message": "Waypoint deleted"})
 
+    class _GetRating(Resource):
+        def get(self):
+            """
+            Get the last rating for a specific address.
+            This endpoint doesn't require authentication.
+            """
+            try:
+                address = request.args.get('address')
+                if not address:
+                    return {'message': 'Address parameter is required'}, 400
+                    
+                rating_info = WaypointsUser.get_last_rating(address)
+                if rating_info is None:
+                    return {'message': 'No ratings found'}, 404
+                    
+                return jsonify(rating_info)
+                
+            except Exception as e:
+                return {'message': str(e)}, 500
 
     api.add_resource(_CRUD, '/waypoints')
+    api.add_resource(_GetRating, '/waypoints/rating')

@@ -40,6 +40,8 @@ class HotelAPI:
             except Exception as e:
                 return {'message': f'Error saving hotel: {e}'}, 500
 
+        @token_required()
+        @cross_origin(supports_credentials=True)  # Add this decorator to handle CORS for PUT requests
         def get(self):
 
             hotel_id = request.args.get('id')
@@ -53,9 +55,12 @@ class HotelAPI:
 
             # all_hotels = Hotel.query.all()
             # return jsonify([hotel.read() for hotel in all_hotels])
-        
+            
+            current_user = g.current_user
+            is_admin = current_user.role == 'Admin'
+            
             hotels = db.session.query(Hotel, User).join(User, Hotel.user_id == User.id).all()
-            hotel_list = [{"id": h.Hotel.id, "user_id": h.User._name, "hotel": h.Hotel.hotel, "city": h.Hotel.city, "country": h.Hotel.country, "rating": h.Hotel.rating, "note": h.Hotel.note} for h in hotels]
+            hotel_list = [{"id": h.Hotel.id, "user_id": h.User._name, "current_user": current_user._name, "is_admin": is_admin, "hotel": h.Hotel.hotel, "city": h.Hotel.city, "country": h.Hotel.country, "rating": h.Hotel.rating, "note": h.Hotel.note} for h in hotels]
             
             return jsonify(hotel_list)
 
@@ -87,7 +92,6 @@ class HotelAPI:
             hotel = Hotel.query.get(data['id'])
             if not hotel:
                 return {'message': 'Hotel not found'}, 404
-
             try:
                 hotel.delete()
                 return {'message': 'Hotel deleted successfully'}, 200
