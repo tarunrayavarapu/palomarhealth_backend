@@ -83,7 +83,7 @@ def initBudgeting():
 
         test_data = [
             Budgeting(expense="Hilton Paris Opera", cost=1000, category="Hotels", user_id=1),
-            Budgeting(expense="Groceries", cost=50, category="Food", user_id=1),
+            Budgeting(expense="Groceries", cost=50, category="Food", user_id=2),
             Budgeting(expense="Paris Metro Pass", cost=80, category="Transport", user_id=1),
         ]
         

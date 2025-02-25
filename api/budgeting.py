@@ -1,101 +1,86 @@
 import jwt
 from flask import Blueprint, request, jsonify, g
 from flask_restful import Api, Resource
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 from datetime import datetime
 from __init__ import app, db  # Ensure db is imported
 from api.jwt_authorize import token_required
-from model.post import Post
 from model.budgeting import Budgeting  # Assuming your Budgeting model is in the 'budgeting' module
+from model.user import User
 
 budgeting_api = Blueprint('budgeting_api', __name__, url_prefix='/api')
 CORS(budgeting_api, supports_credentials=True, methods=["GET", "POST", "PUT", "DELETE"])
 api = Api(budgeting_api)
 
 class BudgetingAPI:
-
+    """
+    Define the API CRUD endpoints for the Budgeting model.
+    Operations include creating, retrieving, updating, and deleting budgeting entries.
+    """
+    
     class _CRUD(Resource):
+        @token_required()
+        @cross_origin(supports_credentials=True)
         def post(self):
-            """
-            Create a new budgeting entry.
-            """
+            current_user = g.current_user
             data = request.get_json()
-
-            # Validate the input data
-            if not data or 'expense' not in data or 'cost' not in data or 'category' not in data or 'user_id' not in data:
-                return {'message': 'Expense, cost, category, and user_id are required'}, 400
-
-            # Create a new budgeting entry
+            
+            if not data or 'expense' not in data or 'cost' not in data or 'category' not in data:
+                return jsonify({"message": "Expense, cost, and category are required"}), 400
+            
             budgeting = Budgeting(
                 expense=data.get('expense'),
                 cost=data.get('cost'),
                 category=data.get('category'),
-                user_id=data.get('user_id')
+                user_id=current_user.id
             )
-
-            try:
-                budgeting.create()
-                return jsonify(budgeting.read())
-            except Exception as e:
-                return {'message': f'Error saving budgeting entry: {e}'}, 500
-
+            
+            db.session.add(budgeting)
+            db.session.commit()
+            
+            return jsonify({"message": "Budgeting entry created successfully"})
+        
+        @token_required()
         def get(self):
-            """
-            Retrieve budgeting entries.
-            """
-            budgeting_id = request.args.get('id')
-
-            if budgeting_id:
-                # Get a specific budgeting entry by ID
-                budgeting = Budgeting.query.get(budgeting_id)
-                if not budgeting:
-                    return {'message': 'Budgeting entry not found'}, 404
-                return jsonify(budgeting.read())
-
-            # Get all budgeting entries
-            all_budgeting = Budgeting.query.all()
-            return jsonify([budgeting.read() for budgeting in all_budgeting])
-
+            current_user = g.current_user
+            budgeting_entries = Budgeting.query.filter_by(user_id=current_user.id).all()
+            return jsonify([entry.read() for entry in budgeting_entries])
+        
+        @token_required()
         def put(self):
-            """
-            Update a budgeting entry.
-            """
+            current_user = g.current_user
             data = request.get_json()
-
-            if not data or 'id' not in data:
-                return {'message': 'ID is required for updating a budgeting entry'}, 400
-
-            # Find the budgeting entry by ID
-            budgeting = Budgeting.query.get(data['id'])
+            budgeting_id = data.get('id')
+            
+            if not budgeting_id:
+                return jsonify({"message": "ID is required for updating a budgeting entry"}), 400
+            
+            budgeting = Budgeting.query.filter_by(id=budgeting_id, user_id=current_user.id).first()
             if not budgeting:
-                return {'message': 'Budgeting entry not found'}, 404
-
-            # Update the entry with new data
-            try:
-                budgeting.update(data)
-                return jsonify(budgeting.read())
-            except Exception as e:
-                return {'message': f'Error updating budgeting entry: {e}'}, 500
-
+                return jsonify({"message": "Budgeting entry not found"}), 404
+            
+            budgeting.expense = data.get('expense', budgeting.expense)
+            budgeting.cost = data.get('cost', budgeting.cost)
+            budgeting.category = data.get('category', budgeting.category)
+            
+            db.session.commit()
+            return jsonify({"message": "Budgeting entry updated successfully"})
+        
+        @token_required()
         def delete(self):
-            """
-            Delete a budgeting entry.
-            """
+            current_user = g.current_user
             data = request.get_json()
-
-            if not data or 'id' not in data:
-                return {'message': 'ID is required for deleting a budgeting entry'}, 400
-
-            # Find the budgeting entry by ID
-            budgeting = Budgeting.query.get(data['id'])
+            budgeting_id = data.get('id')
+            
+            if not budgeting_id:
+                return jsonify({"message": "ID is required for deleting a budgeting entry"}), 400
+            
+            budgeting = Budgeting.query.filter_by(id=budgeting_id, user_id=current_user.id).first()
             if not budgeting:
-                return {'message': 'Budgeting entry not found'}, 404
+                return jsonify({"message": "Budgeting entry not found"}), 404
+            
+            db.session.delete(budgeting)
+            db.session.commit()
+            return jsonify({"message": "Budgeting entry deleted successfully"})
 
-            # Delete the budgeting entry
-            try:
-                budgeting.delete()
-                return {'message': 'Budgeting entry deleted successfully'}, 200
-            except Exception as e:
-                return {'message': f'Error deleting budgeting entry: {e}'}, 500
-
-    api.add_resource(_CRUD, '/budgeting')
+api.add_resource(BudgetingAPI._CRUD, '/budgeting')
