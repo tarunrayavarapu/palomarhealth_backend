@@ -60,7 +60,7 @@ class HotelAPI:
             is_admin = current_user.role == 'Admin'
             
             hotels = db.session.query(Hotel, User).join(User, Hotel.user_id == User.id).all()
-            hotel_list = [{"id": h.Hotel.id, "user_id": h.User._name, "is_admin": is_admin, "hotel": h.Hotel.hotel, "city": h.Hotel.city, "country": h.Hotel.country, "rating": h.Hotel.rating, "note": h.Hotel.note} for h in hotels]
+            hotel_list = [{"id": h.Hotel.id, "user_id": h.User._name, "current_user": current_user._name, "is_admin": is_admin, "hotel": h.Hotel.hotel, "city": h.Hotel.city, "country": h.Hotel.country, "rating": h.Hotel.rating, "note": h.Hotel.note} for h in hotels]
             
             return jsonify(hotel_list)
 
