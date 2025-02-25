@@ -156,6 +156,30 @@ class WaypointsUser(db.Model):
                 waypointsuser = WaypointsUser(**waypoints_data)
                 waypointsuser.create()
         
+    @staticmethod
+    def get_last_rating(address):
+        """
+        Get the last rating for a specific address.
+        
+        Args:
+            address (str): The address to look up
+            
+        Returns:
+            dict: Dictionary containing rating info
+        """
+        # Query the most recent rating for the given address
+        waypoint = WaypointsUser.query.filter_by(_address=address)\
+            .order_by(WaypointsUser.id.desc())\
+            .first()
+            
+        if not waypoint:
+            return None
+            
+        return {
+            "rating": waypoint._rating,
+            "total_ratings": WaypointsUser.query.filter_by(_address=address).count()
+        }
+
 def initWaypointsUser():
     """
     The initWaypoints function creates the WaypointsUser table and adds tester data to the table.
