@@ -18,16 +18,11 @@ from __init__ import app, db, login_manager  # Key Flask objects
 # API endpoints
 from api.user import user_api 
 from api.pfp import pfp_api
-from api.nestImg import nestImg_api # Justin added this, custom format for his website
 from api.post import post_api
-from api.budgetReview import budget_review_api
 from api.channel import channel_api
 from api.group import group_api
 from api.section import section_api
-from api.nestPost import nestPost_api # Justin added this, custom format for his website
 from api.messages_api import messages_api # Adi added this, messages for his website
-from api.carphoto import car_api
-from api.carChat import car_chat_api
 from api.weather import weather_api
 from api.currency import currency_api
 from api.waypoints import waypoints_api
@@ -48,14 +43,11 @@ from api.travel import *
 
 # database Initialization functions
 from model.budgeting import Budgeting, initBudgeting
-from model.carChat import CarChat
 from model.user import User, initUsers
 from model.section import Section, initSections
 from model.group import Group, initGroups
 from model.channel import Channel, initChannels
 from model.post import Post, initPosts
-from model.budgetReview import BudgetReview, initBudgetReviews
-from model.nestPost import NestPost, initNestPosts # Justin added this, custom format for his website
 from model.vote import Vote, initVotes
 from model.rate import Rate, initRates
 from model.waypoints import Waypoints, initWaypoints
@@ -86,15 +78,10 @@ app.register_blueprint(post_api)
 app.register_blueprint(channel_api)
 app.register_blueprint(group_api)
 app.register_blueprint(section_api)
-app.register_blueprint(car_chat_api)
-app.register_blueprint(budget_review_api)
 
 # Added new files to create nestPosts, uses a different format than Mortensen and didn't want to touch his junk
-app.register_blueprint(nestPost_api)
-app.register_blueprint(nestImg_api)
 app.register_blueprint(vote_api)
 app.register_blueprint(rate_api)
-app.register_blueprint(car_api)
 app.register_blueprint(weather_api)
 app.register_blueprint(currency_api)
 app.register_blueprint(waypoints_api)
@@ -219,11 +206,9 @@ def generate_data():
     initSections()
     initGroups()
     initPosts()
-    initNestPosts()
     initVotes()
     # initChannels()
     initRates()
-    initBudgetReviews()
     initWaypoints()
     initWaypointsUser()
     initFlights()
@@ -262,7 +247,6 @@ def extract_data():
         data['flights'] = [flight.read() for flight in Flight.query.all()]
         data['hotel_data'] = [hotel.read() for hotel in Hotel.query.all()]
         data['packing_checklists'] = [item.read() for item in Weather.query.all()]
-        data['budget_reviews'] = [item.read() for item in BudgetReview.query.all()]
         data['budgeting_data'] = [item.read() for item in Budgeting.query.all()]
     return data
 
@@ -278,7 +262,7 @@ def save_data_to_json(data, directory='backup'):
 # Load data from JSON files
 def load_data_from_json(directory='backup'):
     data = {}
-    for table in ['users', 'sections', 'groups', 'channels', 'posts', 'hotel_data', 'flights','waypoints', 'waypointsuser', 'packing_checklists', 'budget_reviews', 'budgeting_data', 'rates']:
+    for table in ['users', 'sections', 'groups', 'channels', 'posts', 'hotel_data', 'flights','waypoints', 'waypointsuser', 'packing_checklists', 'budgeting_data', 'rates']:
         with open(os.path.join(directory, f'{table}.json'), 'r') as f:
             data[table] = json.load(f)
     return data
@@ -298,7 +282,6 @@ def restore_data(data):
         _ = Waypoints.restore(data['waypoints'])
         _ = WaypointsUser.restore(data['waypointsuser'])
         _ = Weather.restore(data['packing_checklists'])
-        _ = BudgetReview.restore(data['budget_reviews'])
 
 
     print("Data restored to the new database.")
