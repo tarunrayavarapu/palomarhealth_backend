@@ -94,8 +94,8 @@ def initPackingChecklist():
 
         test_data = [
             Weather(item="Hat", user_id=1),
-            Weather(item="Sunglasses", user_id=1),
-            Weather(item="French Dictionary", user_id=1),
+            Weather(item="Sunglasses", user_id=2),
+            Weather(item="French Dictionary", user_id=3),
         ]
         
         for data in test_data:

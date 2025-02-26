@@ -47,7 +47,7 @@ class WeatherAPI:
 
 
     class _CRUD(Resource):
-        #@token_required()
+        @token_required()
         @cross_origin(supports_credentials=True)
         def get(self):
             
@@ -60,8 +60,14 @@ class WeatherAPI:
                     return {'message': 'Weather not found'}, 404
                 return jsonify(weather)
             
-            all_items = Weather.query.all()
-            return jsonify([weather.read() for weather in all_items])
+            current_user = g.current_user
+            is_admin = current_user.role == 'Admin'
+            
+            all_items = db.session.query(Weather, User).join(User, Weather.user_id == User.id).all()
+            item_list = [{"id": item.Weather.id, "user_id": item.User._name, "current_user": current_user._name, "is_admin": is_admin, "item": item.Weather.item} for item in all_items]
+            
+            
+            return jsonify(item_list)
             
         @token_required()
         @cross_origin(supports_credentials=True)
