@@ -138,6 +138,7 @@ class WaypointAPI:
             return jsonify({"message": "Waypoint deleted"})
 
     class _GetRating(Resource):
+        @token_required()
         def get(self):
             """
             Get the last rating for a specific address.
