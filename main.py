@@ -11,8 +11,6 @@ from werkzeug.security import generate_password_hash
 import shutil
 from flask import Flask
 
-
-
 # import "objects" from "this" project
 from __init__ import app, db, login_manager  # Key Flask objects 
 # API endpoints
@@ -32,17 +30,14 @@ from api.hotel import hotel_api
 from api.food_review123 import food_review123_api
 from api.food_review12 import food_review_12_api
 from api.food_review1234 import food_review_1234_api
-from api.food_review12345 import food_review_12345_api
-from api.budgeting import budgeting_api
+# Removed budgeting API and database import
 
+from api.palomar import palomar_api
 from api.vote import vote_api
 from api.rate import rate_api
-
 from api.travel import *
 
-
 # database Initialization functions
-from model.budgeting import Budgeting, initBudgeting
 from model.user import User, initUsers
 from model.section import Section, initSections
 from model.group import Group, initGroups
@@ -55,11 +50,8 @@ from model.waypointsuser import WaypointsUser, initWaypointsUser
 from model.flight_api_post import Flight, initFlights
 from model.hotel import Hotel, initHotel
 from model.weather import Weather, initPackingChecklist
-from model.food_review123 import FoodReview123, initFoodReviews
-from model.food_review1 import FoodReview1, initFoodReviews1
-from model.food_review12 import FoodReview12, initFoodReviews12
-from model.food_review1234 import FoodReview1234, initFoodReviews1234
-from model.food_review12345 import FoodReview12345, initFoodReviews12345
+from model.palomar import Palomar, initPalomarHealth
+# Removed budgeting model import
 
 from api.travel.kiruthic import *
 from api.travel.aadi import *
@@ -68,6 +60,7 @@ from api.travel.aaditya import *
 from api.travel.arhaan import *
 from api.travel.tarun import *
 from api.travel.rohan import *
+
 # server only Views
 
 # register URIs for api endpoints
@@ -91,8 +84,8 @@ app.register_blueprint(hotel_api)
 app.register_blueprint(food_review123_api)
 app.register_blueprint(food_review_12_api)
 app.register_blueprint(food_review_1234_api)
-app.register_blueprint(food_review_12345_api)
-app.register_blueprint(budgeting_api)
+# Removed budgeting blueprint registration
+app.register_blueprint(palomar_api)
 
 app.register_blueprint(kiruthic_api)
 app.register_blueprint(aadi_api)
@@ -101,7 +94,6 @@ app.register_blueprint(aaditya_api)
 app.register_blueprint(arhaan_api)
 app.register_blueprint(tarun_api)
 app.register_blueprint(rohan_api)
-
 
 # Tell Flask-Login the view function name of your login route
 login_manager.login_view = "login"
@@ -214,12 +206,10 @@ def generate_data():
     initFlights()
     initHotel()
     initPackingChecklist()
-    initBudgeting()
-    initFoodReviews1()
-    initFoodReviews12()
-    initFoodReviews1234()
-    initFoodReviews12345()
-
+    # initBudgeting() # Removed budgeting initialization
+  
+    initPalomarHealth()
+    
 # Backup the old database
 def backup_database(db_uri, backup_uri):
     """Backup the current database."""
@@ -247,7 +237,7 @@ def extract_data():
         data['flights'] = [flight.read() for flight in Flight.query.all()]
         data['hotel_data'] = [hotel.read() for hotel in Hotel.query.all()]
         data['packing_checklists'] = [item.read() for item in Weather.query.all()]
-        data['budgeting_data'] = [item.read() for item in Budgeting.query.all()]
+        # Removed budgeting data extraction
     return data
 
 # Save extracted data to JSON files
@@ -262,7 +252,7 @@ def save_data_to_json(data, directory='backup'):
 # Load data from JSON files
 def load_data_from_json(directory='backup'):
     data = {}
-    for table in ['users', 'sections', 'groups', 'channels', 'posts', 'hotel_data', 'flights','waypoints', 'waypointsuser', 'packing_checklists', 'budgeting_data', 'rates']:
+    for table in ['users', 'sections', 'groups', 'channels', 'posts', 'hotel_data', 'flights','waypoints', 'waypointsuser', 'packing_checklists', 'rates']:
         with open(os.path.join(directory, f'{table}.json'), 'r') as f:
             data[table] = json.load(f)
     return data
@@ -277,12 +267,11 @@ def restore_data(data):
         # _ = Post.restore(data['posts'])
         _ = Rate.restore(data['rates'])
         _ = Hotel.restore(data['hotel_data'])
-        _ = Budgeting.restore(data['budgeting_data'])
+        # _ = Budgeting.restore(data['budgeting_data']) # Removed budgeting restore
         _ = Flight.restore(data['flights'])
         _ = Waypoints.restore(data['waypoints'])
         _ = WaypointsUser.restore(data['waypointsuser'])
         _ = Weather.restore(data['packing_checklists'])
-
 
     print("Data restored to the new database.")
 
@@ -298,7 +287,7 @@ def backup_data():
 def restore_data_command():
     data = load_data_from_json()
     restore_data(data)
-    
+
 # Register the custom command group with the Flask application
 app.cli.add_command(custom_cli)
         
@@ -306,7 +295,3 @@ app.cli.add_command(custom_cli)
 if __name__ == "__main__":
     # change name for testing
     app.run(debug=True, host="0.0.0.0", port="8101")
-
-@app.route('/budget_table')
-def budget_table():
-    return render_template('budget_table.html')  # Ensure you have this template
