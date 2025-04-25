@@ -1,89 +1,96 @@
-from flask import Blueprint, request, jsonify, g
+from flask import Blueprint, request, jsonify
 from flask_restful import Api, Resource
-from flask_cors import CORS, cross_origin
-from __init__ import db
-from model.palomar import Palomar
-from api.jwt_authorize import token_required
+from datetime import datetime
+from model.palomar import Palomar  # Your model
+from __init__ import app
 
+# Define Blueprint for Palomar Health API
 palomar_api = Blueprint('palomar_api', __name__, url_prefix='/api')
-CORS(palomar_api, supports_credentials=True)
 api = Api(palomar_api)
 
 class PalomarAPI:
+    """
+    API for managing Palomar Health Posts.
+    Includes create, read, update, delete, and analytics.
+    """
 
     class _CRUD(Resource):
-
-        @token_required()
-        @cross_origin(supports_credentials=True)
         def post(self):
+            """
+            Create a new PalomarHealth post
+            """
             data = request.get_json()
-
-            if not data or 'caption' not in data or 'platform' not in data or 'post_type' not in data or 'content' not in data:
-                return {'message': 'Caption, platform, post_type, and content are required'}, 400
+            required_fields = ['caption', 'platform', 'post_type', 'content']
+            if not all(field in data for field in required_fields):
+                return {'message': 'All fields (caption, platform, post_type, content) are required'}, 400
 
             post = Palomar(
-                caption=data.get('caption'),
-                platform=data.get('platform'),
-                post_type=data.get('post_type'),
-                content=data.get('content')
+                caption=data['caption'],
+                platform=data['platform'],
+                post_type=data['post_type'],
+                content=data['content']
             )
+            result = post.create()
+            if result:
+                return jsonify(post.read()), 201
+            return {'message': 'Failed to create post'}, 500
 
-            try:
-                post.create()
-                return jsonify(post.read())
-            except Exception as e:
-                return {'message': f'Error saving post: {e}'}, 500
-
-        @token_required()
-        @cross_origin(supports_credentials=True)
-        def get(self):
-            post_id = request.args.get('id')
-
-            if post_id:
-                post = Palomar.query.get(post_id)
-                if not post:
-                    return {'message': 'Post not found'}, 404
-                return jsonify(post.read())
-
-            posts = Palomar.query.all()
-            post_list = [p.read() for p in posts]
-
-            return jsonify(post_list)
-
-        @token_required()
-        @cross_origin(supports_credentials=True)
         def put(self):
+            """
+            Update an existing PalomarHealth post
+            """
             data = request.get_json()
+            post_id = data.get('id')
+            if not post_id:
+                return {'message': 'Post ID is required for update'}, 400
 
-            if not data or 'id' not in data:
-                return {'message': 'ID is required for updating a post'}, 400
-
-            post = Palomar.query.get(data['id'])
+            post = Palomar.query.get(post_id)
             if not post:
                 return {'message': 'Post not found'}, 404
 
-            try:
-                post.update(data)
-                return jsonify(post.read())
-            except Exception as e:
-                return {'message': f'Error updating post: {e}'}, 500
+            post.update(data)
+            return jsonify(post.read()), 200
 
-        @token_required()
-        @cross_origin(supports_credentials=True)
         def delete(self):
+            """
+            Delete a PalomarHealth post
+            """
             data = request.get_json()
+            post_id = data.get('id')
+            if not post_id:
+                return {'message': 'Post ID is required'}, 400
 
-            if not data or 'id' not in data:
-                return {'message': 'ID is required for deleting a post'}, 400
-
-            post = Palomar.query.get(data['id'])
+            post = Palomar.query.get(post_id)
             if not post:
                 return {'message': 'Post not found'}, 404
 
-            try:
-                post.delete()
-                return {'message': 'Post deleted successfully'}, 200
-            except Exception as e:
-                return {'message': f'Error deleting post: {e}'}, 500
+            post.delete()
+            return jsonify({"message": "Post deleted successfully"}), 200
 
+        def get(self):
+            """
+            Get all PalomarHealth posts
+            """
+            posts = Palomar.query.all()
+            return jsonify([post.read() for post in posts]), 200
+
+    class _ANALYTICS(Resource):
+        def get(self):
+            """
+            Get dummy analytics for testing — real data to be added later.
+            """
+            analytics_data = {
+                "note": "This is tester data. Real analytics will be displayed here later.",
+                "engagement": {
+                    "likes": 42,
+                    "comments": 17,
+                    "shares": 9,
+                    "clicks": 120,
+                },
+                "trending_score": 78.9
+            }
+            return jsonify(analytics_data), 200
+
+    # Register endpoints
     api.add_resource(_CRUD, '/palomar')
+    api.add_resource(_ANALYTICS, '/palomar/analytics')

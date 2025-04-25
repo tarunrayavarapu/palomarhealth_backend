@@ -148,6 +148,19 @@ class Group(db.Model):
         db.session.commit()
         """
         return groups
+
+def create_group(name, section_id, moderators):
+    try:
+        group = Group(name=name, section_id=section_id, moderators=moderators)
+        db.session.add(group)  # Ensure the group is added to the session
+        db.session.commit()
+        print(f"Record created: Group(id={group.id}, name={group.name}, section_id={group.section_id}, moderators={moderators})")
+    except AttributeError as e:
+        print(f"An error occurred: {e}")
+        db.session.rollback()  # Rollback the session in case of an error
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        db.session.rollback()
             
 def initGroups():
     """
@@ -169,9 +182,18 @@ def initGroups():
 
         # Home Page Groups
         home_page_section = Section.query.filter_by(_name='Home Page').first()
+        if not home_page_section:
+            print("Error: 'Home Page' section not found.")
+            return
+
+        moderator = User.query.get(1)
+        if not moderator:
+            print("Error: User with ID 1 not found.")
+            return
+
         groups = [
-            Group(name='General', section_id=home_page_section.id, moderators=[User.query.get(1)]),
-            Group(name='Support', section_id=home_page_section.id, moderators=[User.query.get(1)])
+            Group(name='General', section_id=home_page_section.id, moderators=[moderator]),
+            Group(name='Support', section_id=home_page_section.id, moderators=[moderator])
         ]
         
         for group in groups:
@@ -182,3 +204,6 @@ def initGroups():
             except IntegrityError:
                 db.session.rollback()
                 print(f"Records exist, duplicate email, or error: {group._name}")
+            except Exception as e:
+                db.session.rollback()
+                print(f"Unexpected error: {e}")

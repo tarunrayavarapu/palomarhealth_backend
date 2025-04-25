@@ -24,7 +24,7 @@ class Palomar(db.Model):
         self.content = content
 
     def __repr__(self):
-        return f"Palomar(id={self.id}, caption='{self.caption}', platform='{self.platform}', post_type='{self.post_type}', content='{self.content[:30]}...')"
+        return f"Palomar(id={self.id}, caption={self.caption}, platform={self.platform}, post_type={self.post_type})"
 
     def create(self):
         try:
@@ -47,6 +47,14 @@ class Palomar(db.Model):
             "updated_at": self.updated_at.isoformat() if self.updated_at else None
         }
 
+    def delete(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
+
     def update(self, data):
         self.caption = data.get('caption', self.caption)
         self.platform = data.get('platform', self.platform)
@@ -59,33 +67,14 @@ class Palomar(db.Model):
             db.session.rollback()
             raise e
 
-    def delete(self):
-        try:
-            db.session.delete(self)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            raise e
-
-    @staticmethod
-    def restore(data):
-        for post_data in data:
-            _ = post_data.pop('id', None)
-            caption = post_data.get("caption", None)
-            post = Palomar.query.filter_by(caption=caption).first()
-            if post:
-                post.update(post_data)
-            else:
-                post = Palomar(**post_data)
-                post.update(post_data)
-                post.create()
-
-
 def initPalomarHealth():
+    """
+    Initialize the PalomarHealth table with static data.
+    """
     with app.app_context():
         db.create_all()
 
-        test_data = [
+        test_posts = [
             Palomar(caption="Stay Hydrated!", platform="Twitter", post_type="Health Tip", content="Drink 8 glasses of water a day!"),
             Palomar(caption="Free Health Checkup!", platform="Instagram", post_type="Event", content="Join us for a free health checkup event at our clinic!"),
             Palomar(caption="Boost Your Energy!", platform="Facebook", post_type="Motivational", content="Get moving with a 20-minute workout every morning!"),
@@ -94,10 +83,11 @@ def initPalomarHealth():
             Palomar(caption="Mental Health Matters", platform="Instagram", post_type="Health Tip", content="Take time for your mental health. It's just as important!"),
         ]
 
-        for entry in test_data:
+        for post in test_posts:
             try:
-                entry.create()
-                print(f"Record created: {repr(entry)}")
+                result = post.create()
+                if result:
+                    print(f"Record created: {repr(post)}")
             except IntegrityError:
                 db.session.remove()
-                print(f"Record exists or error: {entry.caption}, {entry.platform}, {entry.post_type}")
+                print(f"Error or duplicate: {post.caption}, {post.platform}, {post.post_type}")

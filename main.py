@@ -25,11 +25,7 @@ from api.weather import weather_api
 from api.currency import currency_api
 from api.waypoints import waypoints_api
 from api.flight_api import flight_api
-from api.food_review1 import food_review_1_api
 from api.hotel import hotel_api
-from api.food_review123 import food_review123_api
-from api.food_review12 import food_review_12_api
-from api.food_review1234 import food_review_1234_api
 # Removed budgeting API and database import
 
 from api.palomar import palomar_api
@@ -79,11 +75,8 @@ app.register_blueprint(weather_api)
 app.register_blueprint(currency_api)
 app.register_blueprint(waypoints_api)
 app.register_blueprint(flight_api)
-app.register_blueprint(food_review_1_api)
 app.register_blueprint(hotel_api)
-app.register_blueprint(food_review123_api)
-app.register_blueprint(food_review_12_api)
-app.register_blueprint(food_review_1234_api)
+\
 # Removed budgeting blueprint registration
 app.register_blueprint(palomar_api)
 
@@ -294,4 +287,4 @@ app.cli.add_command(custom_cli)
 # this runs the flask application on the development server
 if __name__ == "__main__":
     # change name for testing
-    app.run(debug=True, host="0.0.0.0", port="8101")
+    app.run(debug=True, host="0.0.0.0", port="8887")
