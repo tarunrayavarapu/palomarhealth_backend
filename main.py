@@ -10,6 +10,7 @@ from flask import current_app
 from werkzeug.security import generate_password_hash
 import shutil
 from flask import Flask
+import google.generativeai as genai
 
 # import "objects" from "this" project
 from __init__ import app, db, login_manager  # Key Flask objects 
@@ -47,6 +48,7 @@ from model.flight_api_post import Flight, initFlights
 from model.hotel import Hotel, initHotel
 from model.weather import Weather, initPackingChecklist
 from model.palomar import Palomar, initPalomarHealth
+from model.poseidon import PoseidonChatLog, initPoseidonChatLogs
 # Removed budgeting model import
 from model.socialMediaLLM import SocialMediaModel
 
@@ -162,6 +164,11 @@ def u2table():
     users = User.query.all()
     return render_template("u2table.html", user_data=users)
 
+@app.route('/poseidon')
+def pose_admin():
+    logs = PoseidonChatLog.query.all()
+    return render_template("poseidon.html", user_data=logs)
+
 # Helper function to extract uploads for a user (ie PFP image)
 @app.route('/uploads/<path:filename>')
 def uploaded_file(filename):
@@ -191,12 +198,94 @@ def reset_password(user_id):
         return jsonify({'message': 'Password reset successfully'}), 200
     return jsonify({'error': 'Password reset failed'}), 500
 
+# AI configuration
+genai.configure(api_key="AIzaSyBMcVuDMgOq9prsdFzV_YKNUVjVSyyt-ag")
+model = genai.GenerativeModel('models/gemini-1.5-pro')
+
+models = genai.list_models()
+for model in models:
+    print(model.name, model.supported_generation_methods)
+
+@app.route('/api/ai/help', methods=['POST'])
+def ai_homework_help():
+    data = request.get_json()
+    question = data.get("question", "")
+    if not question:
+        return jsonify({"error": "No question provided."}), 400
+
+    try:
+        response = model.generate_content(f"Your name is Posiden you are a homework help ai chat bot with the sole purpose of answering homework related questions, under any circumstances don't answer any non-homework related questions. \nHere is your prompt: {question}")
+        response_text = response.text
+
+        # Save to database
+        new_entry = PoseidonChatLog(question=question, response=response_text)
+        new_entry.create()
+
+        return jsonify({"response": response_text}), 200
+    except Exception as e:
+        print("error!")
+        print(e)
+        return jsonify({"error": str(e)}), 500     # ju poo bDA KLINGO A POO A NEW KAMA KJIT HAAIIII SLIBITISA DOOP A D WIT  bood a a bidaa boop kayy haiiiii  
+
+@app.route('/api/ai/update', methods=['PUT'])
+def update_ai_question():
+    data = request.get_json()
+    old_question = data.get("oldQuestion", "")
+    new_question = data.get("newQuestion", "")
+
+    if not old_question or not new_question:
+        return jsonify({"error": "Both old and new questions are required."}), 400
+
+    # Fetch the old log
+    log = PoseidonChatLog.query.filter_by(_question=old_question).first()
+    if not log:
+        return jsonify({"error": "Old question not found."}), 404
+
+    try:
+        # Generate a new response for the new question
+        response = model.generate_content(f"Your name is Poseidon, you are a homework help AI chatbot. Only answer homework-related questions. \nHere is your prompt: {new_question}")
+        new_response = response.text
+
+        # Update the database entry
+        log._question = new_question
+        log._response = new_response
+        db.session.commit()
+
+        return jsonify({"response": new_response}), 200
+    except Exception as e:
+        print("Error during update:", e)
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/ai/logs', methods=['GET'])
+def fetch_all_logs():
+    try:
+        logs = PoseidonChatLog.query.all()
+        return jsonify([log.read() for log in logs]), 200
+    except Exception as e:
+        print("Error fetching logs:", e)
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/ai/delete", methods=["DELETE"])
+def delete_ai_chat_logs():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data provided."}), 400
+    
+    log = PoseidonChatLog.query.filter_by(_question=data.get("question", "")).first()
+    if not log:
+        return jsonify({"error": "Chat log not found."}), 404
+    
+    log.delete()
+    return jsonify({"response": "Chat log deleted"}), 200
+
 # Create an AppGroup for custom commands
 custom_cli = AppGroup('custom', help='Custom commands')
 
 # Define a command to run the data generation functions
 @custom_cli.command('generate_data')
 def generate_data():
+    initPoseidonChatLogs()
     initUsers()
     initSections()
     initGroups()
@@ -228,6 +317,7 @@ def backup_database(db_uri, backup_uri):
 def extract_data():
     data = {}
     with app.app_context():
+        data['poseidon_chat_logs'] = [log.read() for log in PoseidonChatLog.query.all()]
         data['users'] = [user.read() for user in User.query.all()]
         data['sections'] = [section.read() for section in Section.query.all()]
         data['groups'] = [group.read() for group in Group.query.all()]
@@ -255,7 +345,7 @@ def save_data_to_json(data, directory='backup'):
 # Load data from JSON files
 def load_data_from_json(directory='backup'):
     data = {}
-    for table in ['users', 'sections', 'groups', 'channels', 'posts', 'hotel_data', 'flights','waypoints', 'waypointsuser', 'packing_checklists', 'rates']:
+    for table in ['poseidon_chat_logs','users', 'sections', 'groups', 'channels', 'posts', 'hotel_data', 'flights','waypoints', 'waypointsuser', 'packing_checklists', 'rates']:
         with open(os.path.join(directory, f'{table}.json'), 'r') as f:
             data[table] = json.load(f)
     return data
@@ -263,6 +353,7 @@ def load_data_from_json(directory='backup'):
 # Restore data to the new database
 def restore_data(data):
     with app.app_context():
+        _ = PoseidonChatLog.restore(data['poseidon_chat_logs'])
         users = User.restore(data['users'])
         _ = Section.restore(data['sections'])
         _ = Group.restore(data['groups'], users)
