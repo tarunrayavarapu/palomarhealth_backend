@@ -190,7 +190,11 @@ def reset_password(user_id):
 
 # AI configuration
 genai.configure(api_key="AIzaSyBMcVuDMgOq9prsdFzV_YKNUVjVSyyt-ag")
-model = genai.GenerativeModel('gemini-pro')
+model = genai.GenerativeModel('models/gemini-1.5-pro')
+
+models = genai.list_models()
+for model in models:
+    print(model.name, model.supported_generation_methods)
 
 @app.route('/api/ai/help', methods=['POST'])
 def ai_homework_help():
