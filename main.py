@@ -48,6 +48,7 @@ from model.hotel import Hotel, initHotel
 from model.weather import Weather, initPackingChecklist
 from model.palomar import Palomar, initPalomarHealth
 # Removed budgeting model import
+from model.socialMediaLLM import SocialMediaModel
 
 from api.travel.kiruthic import *
 from api.travel.aadi import *
@@ -109,6 +110,15 @@ def is_safe_url(target):
     ref_url = urlparse(request.host_url)
     test_url = urlparse(urljoin(request.host_url, target))
     return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
+
+# Scary thing I added -Justin
+@app.route('/socialMediaModel', methods=['POST'])
+def socialMediaModel():
+    data = request.get_json()
+    socialMediaModel = SocialMediaModel.get_instance()
+    predicted_favorites = socialMediaModel.predict(data)
+    return f'Predicted # of Favorites: {predicted_favorites}'
+    
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
