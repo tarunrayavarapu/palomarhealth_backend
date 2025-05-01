@@ -11,6 +11,7 @@ from werkzeug.security import generate_password_hash
 import shutil
 from flask import Flask
 
+
 # import "objects" from "this" project
 from __init__ import app, db, login_manager  # Key Flask objects 
 # API endpoints
@@ -117,7 +118,7 @@ def socialMediaModel():
     data = request.get_json()
     socialMediaModel = SocialMediaModel.get_instance()
     predicted_favorites = socialMediaModel.predict(data)
-    return f'Predicted # of Favorites: {predicted_favorites}'
+    return jsonify({'predicted_favorites': predicted_favorites})
     
 
 @app.route('/login', methods=['GET', 'POST'])
