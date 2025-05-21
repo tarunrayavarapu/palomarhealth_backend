@@ -234,6 +234,7 @@ class UserAPI:
                     "message": "Failed to invalidate token",
                     "error": str(e)
                 }, 500
+    
     class _ID(Resource):  # Individual identification API operation
         @token_required()
         def get(self):
@@ -241,6 +242,59 @@ class UserAPI:
             current_user = g.current_user
             ''' Return the current user as a json object '''
             return jsonify(current_user.read())
+            
+    class _GradeData(Resource):
+        """
+        Grade data API operations
+        """
+        
+        @token_required()
+        def get(self):
+            """
+            Get the grade data for a user.
+            """
+            current_user = g.current_user
+            
+            # If request includes a UID parameter and user is admin, get that user's grade data
+            uid = request.args.get('uid')
+            if current_user.role == 'Admin' and uid:
+                user = User.query.filter_by(_uid=uid).first()
+                if not user:
+                    return {'message': f'User {uid} not found'}, 404
+            else:
+                user = current_user  # Get the current user's grade data
+                
+            return jsonify({'uid': user.uid, 'grade_data': user.grade_data})
+        
+        @token_required()
+        def post(self):
+            """
+            Add or update grade data for a user.
+            """
+            current_user = g.current_user
+            body = request.get_json()
+            
+            # Determine which user's grade data to update
+            uid = body.get('uid')
+            if current_user.role == 'Admin' and uid:
+                user = User.query.filter_by(_uid=uid).first()
+                if not user:
+                    return {'message': f'User {uid} not found'}, 404
+            else:
+                # Non-admins can only update their own grade data
+                if uid and uid != current_user.uid and current_user.role != 'Admin':
+                    return {'message': 'Permission denied: You can only update your own grade data'}, 403
+                user = current_user
+            
+            # Get the grade data from the request
+            grade_data = body.get('grade_data')
+            if not grade_data:
+                return {'message': 'Grade data is missing'}, 400
+                
+            # Update the user's grade data
+            user.update({'grade_data': grade_data})
+            
+            return jsonify({'message': 'Grade data updated successfully', 'uid': user.uid, 'grade_data': user.grade_data})
 
 # Register the API resources with the Blueprint
 api.add_resource(UserAPI._ID, '/id')

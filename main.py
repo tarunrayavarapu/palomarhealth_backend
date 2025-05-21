@@ -10,7 +10,7 @@ from flask import current_app
 from werkzeug.security import generate_password_hash
 import shutil
 from flask import Flask
-import google.generativeai as genai
+#import google.generativeai as genai
 
 
 # import "objects" from "this" project
@@ -200,12 +200,12 @@ def reset_password(user_id):
     return jsonify({'error': 'Password reset failed'}), 500
 
 # AI configuration
-genai.configure(api_key="AIzaSyBMcVuDMgOq9prsdFzV_YKNUVjVSyyt-ag")
-model = genai.GenerativeModel('models/gemini-1.5-pro')
+#genai.configure(api_key="AIzaSyBMcVuDMgOq9prsdFzV_YKNUVjVSyyt-ag")
+#model = genai.GenerativeModel('models/gemini-1.5-pro')
 
-models = genai.list_models()
-for model in models:
-    print(model.name, model.supported_generation_methods)
+#models = genai.list_models()
+#for model in models:
+    #print(model.name, model.supported_generation_methods)
 
 @app.route('/api/ai/help', methods=['POST'])
 def ai_homework_help():
