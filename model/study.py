@@ -3,6 +3,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 import json
 
+import sys, os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from __init__ import db
 from model.user import User
 
