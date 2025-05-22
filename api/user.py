@@ -319,35 +319,6 @@ class UserAPI:
                 
             return jsonify({'uid': user.uid, 'ap_exam': user.ap_exam})
         
-        @token_required()
-        def post(self):
-            """
-            Add or update AP exam data for a user.
-            """
-            current_user = g.current_user
-            body = request.get_json()
-            
-            # Determine which user's AP exam data to update
-            uid = body.get('uid')
-            if current_user.role == 'Admin' and uid:
-                user = User.query.filter_by(_uid=uid).first()
-                if not user:
-                    return {'message': f'User {uid} not found'}, 404
-            else:
-                # Non-admins can only update their own AP exam data
-                if uid and uid != current_user.uid and current_user.role != 'Admin':
-                    return {'message': 'Permission denied: You can only update your own AP exam data'}, 403
-                user = current_user
-            
-            # Get the AP exam data from the request
-            ap_exam = body.get('ap_exam')
-            if not ap_exam:
-                return {'message': 'AP exam data is missing'}, 400
-                
-            # Update the user's AP exam data
-            user.update({'ap_exam': ap_exam})
-            
-            return jsonify({'message': 'AP exam data updated successfully', 'uid': user.uid, 'ap_exam': user.ap_exam})
 
 # Register the API resources with the Blueprint
 api.add_resource(UserAPI._ID, '/id')
