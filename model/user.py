@@ -49,6 +49,7 @@ class User(db.Model, UserMixin):
         _role (Column): A string representing the user's role within the application. Defaults to "User".
         _pfp (Column): A string representing the path to the user's profile picture. It can be null.
         _grade_data (Column): A JSON column storing assessment data for the user including grades, attendance, etc.
+        _ap_exam (Column): A JSON column storing AP exam data including predicted and manual scores.
     """
     __tablename__ = 'users'
 
@@ -61,11 +62,12 @@ class User(db.Model, UserMixin):
     _pfp = db.Column(db.String(255), unique=False, nullable=True)
     _car = db.Column(db.String(255), unique=False, nullable=True)
     _grade_data = db.Column(db.JSON, unique=False, nullable=True)
+    _ap_exam = db.Column(db.JSON, unique=False, nullable=True)
    
     posts = db.relationship('Post', backref='author', lazy=True)
                                  
     
-    def __init__(self, name, uid, password="", role="User", pfp='', car='', email='?', grade_data=None):
+    def __init__(self, name, uid, password="", role="User", pfp='', car='', email='?', grade_data=None, ap_exam=None):
         """
         Constructor, 1st step in object creation.
         
@@ -78,6 +80,7 @@ class User(db.Model, UserMixin):
             car (str): The path to the user's car picture. Defaults to an empty string.
             email (str): The user's email. Defaults to '?'.
             grade_data (dict): JSON data containing assessment information. Defaults to None.
+            ap_exam (dict): JSON data containing AP exam scores. Defaults to None.
         """
         self._name = name
         self._uid = uid
@@ -87,6 +90,7 @@ class User(db.Model, UserMixin):
         self._pfp = pfp
         self._car = car
         self._grade_data = grade_data if grade_data else {}
+        self._ap_exam = ap_exam if ap_exam else {}
 
     # UserMixin/Flask-Login requires a get_id method to return the id as a string
     def get_id(self):
@@ -331,6 +335,26 @@ class User(db.Model, UserMixin):
         """
         self._grade_data = grade_data
     
+    @property
+    def ap_exam(self):
+        """
+        Gets the user's AP exam data.
+        
+        Returns:
+            dict: The user's AP exam data in JSON format.
+        """
+        return self._ap_exam
+    
+    @ap_exam.setter
+    def ap_exam(self, ap_exam):
+        """
+        Sets the user's AP exam data.
+        
+        Args:
+            ap_exam (dict): The new AP exam data for the user.
+        """
+        self._ap_exam = ap_exam
+    
     def create(self, inputs=None):
         """
         Adds a new record to the table and commits the transaction.
@@ -366,7 +390,8 @@ class User(db.Model, UserMixin):
             "role": self._role,
             "pfp": self._pfp,
             "car": self._car,
-            "grade_data": self._grade_data
+            "grade_data": self._grade_data,
+            "ap_exam": self._ap_exam
         }
         return data
         
@@ -388,6 +413,7 @@ class User(db.Model, UserMixin):
         password = inputs.get("password", "")
         pfp = inputs.get("pfp", None)
         grade_data = inputs.get("grade_data", None)
+        ap_exam = inputs.get("ap_exam", None)
 
         # Update table with new data
         if name:
@@ -400,6 +426,8 @@ class User(db.Model, UserMixin):
             self.pfp = pfp
         if grade_data is not None:
             self.grade_data = grade_data
+        if ap_exam is not None:
+            self.ap_exam = ap_exam
 
         # Check this on each update
         self.set_email()
@@ -552,37 +580,57 @@ def initUsers():
             'organization': 5
         }
 
+        default_ap_exam = {
+            'predicted_score': {
+                'practice_based': {
+                    'mcq_2018': 0,
+                    'mcq_2020': 0,
+                    'mcq_2021': 0,
+                    'practice_frq': 0,
+                    'predicted_ap_score': 0,
+                    'confidence_level': 'Low'
+                },
+                'manual_calculator': {
+                    'mcq_score': 60,
+                    'frq_score': 6,
+                    'composite_score': 90,
+                    'predicted_ap_score': 5
+                }
+            },
+            'last_updated': None
+        }
+
         u1 = User(name='Thomas Edison', uid=app.config['ADMIN_USER'], password=app.config['ADMIN_PASSWORD'],
-                pfp='toby.png', car='toby_car.png', role="Admin", grade_data=default_grade_data)
-        u3 = User(name='Nicholas Tesla', uid='niko', password='123niko', pfp='niko.png', grade_data=default_grade_data)
+                pfp='toby.png', car='toby_car.png', role="Admin", grade_data=default_grade_data, ap_exam=default_ap_exam)
+        u3 = User(name='Nicholas Tesla', uid='niko', password='123niko', pfp='niko.png', grade_data=default_grade_data, ap_exam=default_ap_exam)
         u4 = User(name='Arhaan Memon', uid='amemon', password=app.config['DEFAULT_PASSWORD'],
-                pfp='toby.png', car='toby_car.png', role="Admin", grade_data=default_grade_data)
-        u5 = User(name='David Brown', uid='david', password='123David!', grade_data=default_grade_data)
-        u6 = User(name='Sarah Williams', uid='sarah', password='123Sarah!', grade_data=default_grade_data)
-        u7 = User(name='James Wilson', uid='james', password='123James!', grade_data=default_grade_data)
-        u8 = User(name='Olivia Taylor', uid='olivia', password='123Olivia!', grade_data=default_grade_data)
-        u9 = User(name='Daniel Anderson', uid='daniel', password='123Daniel!', grade_data=default_grade_data)
-        u10 = User(name='Sophia Thomas', uid='sophia', password='123Sophia!', grade_data=default_grade_data)
-        u11 = User(name='Matthew Martinez', uid='matthew', password='123Matthew!', grade_data=default_grade_data)
-        u12 = User(name='Charlotte Moore', uid='charlotte', password='123Charlotte!', grade_data=default_grade_data)
-        u13 = User(name='William Jackson', uid='william', password='123William!', grade_data=default_grade_data)
-        u14 = User(name='Ava Lee', uid='ava', password='123Ava!', grade_data=default_grade_data)
-        u15 = User(name='Benjamin Harris', uid='benjamin', password='123Benjamin!', grade_data=default_grade_data)
-        u16 = User(name='Isabella Clark', uid='isabella', password='123Isabella!', grade_data=default_grade_data)
-        u17 = User(name='Lucas Lewis', uid='lucas', password='123Lucas!', grade_data=default_grade_data)
-        u18 = User(name='Amelia Walker', uid='amelia', password='123Amelia!', grade_data=default_grade_data)
-        u19 = User(name='Ethan Hall', uid='ethan', password='123Ethan!', grade_data=default_grade_data)
-        u20 = User(name='Mia Young', uid='mia', password='123Mia!', grade_data=default_grade_data)
-        u21 = User(name='Alexander King', uid='alexander', password='123Alexander!', grade_data=default_grade_data)
-        u22 = User(name='Chloe Scott', uid='chloe', password='123Chloe!', grade_data=default_grade_data)
-        u23 = User(name='Henry Adams', uid='henry', password='123Henry!', grade_data=default_grade_data)
-        u24 = User(name='Ella Green', uid='ella', password='123Ella!', grade_data=default_grade_data)
-        u25 = User(name='Jack Nelson', uid='jack', password='123Jack!', grade_data=default_grade_data)
-        u26 = User(name='Lily Carter', uid='lily', password='123Lily!', grade_data=default_grade_data)
-        u27 = User(name='Noah Mitchell', uid='noah', password='123Noah!', grade_data=default_grade_data)
-        u28 = User(name='Grace Perez', uid='grace', password='123Grace!', grade_data=default_grade_data)
-        u29 = User(name='Matthew Robinson', uid='matthew', password='123Matthew!', grade_data=default_grade_data)
-        u30 = User(name='Hannah Garcia', uid='hannah', password='123Hannah!', grade_data=default_grade_data)
+                pfp='toby.png', car='toby_car.png', role="Admin", grade_data=default_grade_data, ap_exam=default_ap_exam)
+        u5 = User(name='David Brown', uid='david', password='123David!', grade_data=default_grade_data, ap_exam=default_ap_exam)
+        u6 = User(name='Sarah Williams', uid='sarah', password='123Sarah!', grade_data=default_grade_data, ap_exam=default_ap_exam)
+        u7 = User(name='James Wilson', uid='james', password='123James!', grade_data=default_grade_data, ap_exam=default_ap_exam)
+        u8 = User(name='Olivia Taylor', uid='olivia', password='123Olivia!', grade_data=default_grade_data, ap_exam=default_ap_exam)
+        u9 = User(name='Daniel Anderson', uid='daniel', password='123Daniel!', grade_data=default_grade_data, ap_exam=default_ap_exam)
+        u10 = User(name='Sophia Thomas', uid='sophia', password='123Sophia!', grade_data=default_grade_data, ap_exam=default_ap_exam)
+        u11 = User(name='Matthew Martinez', uid='matthew', password='123Matthew!', grade_data=default_grade_data, ap_exam=default_ap_exam)
+        u12 = User(name='Charlotte Moore', uid='charlotte', password='123Charlotte!', grade_data=default_grade_data, ap_exam=default_ap_exam)
+        u13 = User(name='William Jackson', uid='william', password='123William!', grade_data=default_grade_data, ap_exam=default_ap_exam)
+        u14 = User(name='Ava Lee', uid='ava', password='123Ava!', grade_data=default_grade_data, ap_exam=default_ap_exam)
+        u15 = User(name='Benjamin Harris', uid='benjamin', password='123Benjamin!', grade_data=default_grade_data, ap_exam=default_ap_exam)
+        u16 = User(name='Isabella Clark', uid='isabella', password='123Isabella!', grade_data=default_grade_data, ap_exam=default_ap_exam)
+        u17 = User(name='Lucas Lewis', uid='lucas', password='123Lucas!', grade_data=default_grade_data, ap_exam=default_ap_exam)
+        u18 = User(name='Amelia Walker', uid='amelia', password='123Amelia!', grade_data=default_grade_data, ap_exam=default_ap_exam)
+        u19 = User(name='Ethan Hall', uid='ethan', password='123Ethan!', grade_data=default_grade_data, ap_exam=default_ap_exam)
+        u20 = User(name='Mia Young', uid='mia', password='123Mia!', grade_data=default_grade_data, ap_exam=default_ap_exam)
+        u21 = User(name='Alexander King', uid='alexander', password='123Alexander!', grade_data=default_grade_data, ap_exam=default_ap_exam)
+        u22 = User(name='Chloe Scott', uid='chloe', password='123Chloe!', grade_data=default_grade_data, ap_exam=default_ap_exam)
+        u23 = User(name='Henry Adams', uid='henry', password='123Henry!', grade_data=default_grade_data, ap_exam=default_ap_exam)
+        u24 = User(name='Ella Green', uid='ella', password='123Ella!', grade_data=default_grade_data, ap_exam=default_ap_exam)
+        u25 = User(name='Jack Nelson', uid='jack', password='123Jack!', grade_data=default_grade_data, ap_exam=default_ap_exam)
+        u26 = User(name='Lily Carter', uid='lily', password='123Lily!', grade_data=default_grade_data, ap_exam=default_ap_exam)
+        u27 = User(name='Noah Mitchell', uid='noah', password='123Noah!', grade_data=default_grade_data, ap_exam=default_ap_exam)
+        u28 = User(name='Grace Perez', uid='grace', password='123Grace!', grade_data=default_grade_data, ap_exam=default_ap_exam)
+        u29 = User(name='Matthew Robinson', uid='matthew', password='123Matthew!', grade_data=default_grade_data, ap_exam=default_ap_exam)
+        u30 = User(name='Hannah Garcia', uid='hannah', password='123Hannah!', grade_data=default_grade_data, ap_exam=default_ap_exam)
 
 
         users = [u1, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12, u13, u14, u15, u16, u17, u18, u19, u20, u21, u22, u23, u24, u25, u26, u27, u28, u29, u30]
