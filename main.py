@@ -34,6 +34,7 @@ from api.palomar import palomar_api
 from api.vote import vote_api
 from api.rate import rate_api
 from api.travel import *
+from api.study import study_api
 
 # database Initialization functions
 from model.user import User, initUsers
@@ -52,6 +53,7 @@ from model.palomar import Palomar, initPalomarHealth
 from model.poseidon import PoseidonChatLog, initPoseidonChatLogs
 # Removed budgeting model import
 from model.socialMediaLLM import SocialMediaModel
+from model.study import Study, initStudies
 
 from api.travel.kiruthic import *
 from api.travel.aadi import *
@@ -80,9 +82,9 @@ app.register_blueprint(currency_api)
 app.register_blueprint(waypoints_api)
 app.register_blueprint(flight_api)
 app.register_blueprint(hotel_api)
-\
 # Removed budgeting blueprint registration
 app.register_blueprint(palomar_api)
+app.register_blueprint(study_api)
 
 app.register_blueprint(kiruthic_api)
 app.register_blueprint(aadi_api)
@@ -152,6 +154,10 @@ def page_not_found(e):
 def index():
     print("Home:", current_user)
     return render_template("index.html")
+
+@app.route('/studytracker')  # route for the study tracker page
+def studytracker():
+    return render_template("studytracker.html")
 
 @app.route('/users/table')
 @login_required
@@ -286,21 +292,23 @@ custom_cli = AppGroup('custom', help='Custom commands')
 # Define a command to run the data generation functions
 @custom_cli.command('generate_data')
 def generate_data():
-    initPoseidonChatLogs()
+    # init database generators
     initUsers()
     initSections()
+    initChannels()
     initGroups()
     initPosts()
     initVotes()
-    # initChannels()
     initRates()
     initWaypoints()
     initWaypointsUser()
     initFlights()
     initHotel()
     initPackingChecklist()
-    # initBudgeting() # Removed budgeting initialization
-  
+    initPalomarHealth()
+    initPoseidonChatLogs()
+    initStudies()
+
     initPalomarHealth()
     
 # Backup the old database
