@@ -28,6 +28,8 @@ from api.currency import currency_api
 from api.waypoints import waypoints_api
 from api.flight_api import flight_api
 from api.hotel import hotel_api
+from api.grade_api import grade_api
+
 # Removed budgeting API and database import
 
 from api.palomar import palomar_api
@@ -93,6 +95,7 @@ app.register_blueprint(aaditya_api)
 app.register_blueprint(arhaan_api)
 app.register_blueprint(tarun_api)
 app.register_blueprint(rohan_api)
+app.register_blueprint(grade_api)
 
 # Tell Flask-Login the view function name of your login route
 login_manager.login_view = "login"
